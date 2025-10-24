@@ -1,0 +1,14 @@
+language: javascript
+environment: n8n
+workflow_path: /workflows/phase0+1.json
+rules:
+  - Preserve all node IDs and connections.
+  - Never rename parameters unless explicitly instructed.
+  - Maintain JSON schema for n8n 1.x.
+  - Validate that every node has `parameters`, `type`, `id`, and `name`.
+  - Automatically reformat JSON with 2-space indentation.
+  - Ignore credentials and secrets.
+tasks:
+  - review_workflow_structure
+  - check_json_integrity
+  - suggest_refactors_nonbreaking
