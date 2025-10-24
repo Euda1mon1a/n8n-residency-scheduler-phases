@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -e
+mkdir -p workflows docs .codex
+[ -f docs/airtable_schema.json ] || echo "{}" > docs/airtable_schema.json
+cat > .codex/config.yml <<YAML
+language: javascript
+environment: n8n
+workflow_path: workflows/phase0+1.json
+schema_source: docs/airtable_schema.json
+field_ref_mode: id
+auto_update: true
+rules:
+  - Preserve all node IDs and connections.
+  - Never rename parameters unless explicitly instructed.
+  - Maintain JSON schema for n8n 1.x.
+  - Validate that every node has `parameters`, `type`, `id`, and `name`.
+  - Automatically reformat JSON with 2-space indentation.
+  - Ignore credentials and secrets.
+tasks:
+  - review_workflow_structure
+  - check_json_integrity
+  - suggest_refactors_nonbreaking
+YAML
+command -v codex >/dev/null 2>&1 && codex validate || true
