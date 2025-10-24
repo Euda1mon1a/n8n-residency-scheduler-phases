@@ -1,0 +1,41 @@
+name: Residency Scheduler – Multi-LLM Loop
+goals:
+  - Keep Airtable+n8n schema stable by ID.
+  - Generate code in Claude, integrate via ChatGPT, lint with Codex, implement with Atlas.
+artifacts:
+  - workflows/phase0+1.json
+  - docs/airtable_schema.json
+  - .codex/config.yml
+runs:
+  - id: codex_fix
+    desc: Ensure Codex paths exist and validate
+    shell: bash
+    script: ./atlas/scripts/fix_codex_config.sh
+  - id: implement
+    desc: Apply latest JSON to n8n and verify
+    shell: bash
+    script: ./atlas/scripts/implement_workflow.sh
+  - id: test_ui
+    desc: Open n8n + Airtable UIs for manual run
+    browser:
+      open:
+        - https://app.n8n.cloud/workflows
+        - https://airtable.com
+      notes: "Before any n8n copy-paste: validate JSON with n8n-nodes-data-validation. If upload fails, run JSON validation first."
+  - id: report
+    desc: Commit results
+    shell: bash
+    script: |
+      git add -A
+      git commit -m "Atlas: implement + validate Phase0+1; attach logs" || true
+      git push || true
+llm_loop:
+  strategy_owner: ChatGPT
+  heavy_codegen: Claude Opus 4.1
+  linter: Codex (format only)
+  executor: Atlas
+  steps:
+    - ChatGPT: write spec + node diffs
+    - Claude: emit ready-to-drop JS/JSON
+    - Codex: reformat only (no semantic edits)
+    - Atlas: implement + test + log
