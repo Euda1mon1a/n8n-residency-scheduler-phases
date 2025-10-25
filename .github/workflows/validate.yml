@@ -1,0 +1,28 @@
+name: Validate
+
+on: [push, pull_request]
+
+jobs:
+  codex-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install ajv-cli for JSON schema lint (fallback)
+        run: npm i -g ajv-cli
+      - name: Codex validate if available
+        run: |
+          if command -v codex >/dev/null 2>&1; then
+            codex validate;
+          else
+            echo "codex not installed in CI; skipping codex validate";
+          fi
+      - name: Basic JSON sanity (workflows/*.json)
+        run: |
+          for f in workflows/*.json; do
+            [ -f "$f" ] || continue;
+            node -e "JSON.parse(require('fs').readFileSync(process.argv[1],'utf8'))" "$f";
+          done

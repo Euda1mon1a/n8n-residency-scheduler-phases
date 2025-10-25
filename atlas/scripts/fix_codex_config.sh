@@ -21,4 +21,4 @@ tasks:
   - check_json_integrity
   - suggest_refactors_nonbreaking
 YAML
-command -v codex >/dev/null 2>&1 && codex validate || true
+if command -v codex >/dev/null 2>&1; then codex validate; fi
