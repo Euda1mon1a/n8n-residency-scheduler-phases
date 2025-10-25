@@ -1,1 +1,178 @@
-{}
+{
+  "tables": [
+    {
+      "id": "tbl3TfpZSGYGxlCIG",
+      "name": "Residency Block Schedule",
+      "fields": [
+        {
+          "id": "fld9jU1b60KFqZSWx",
+          "name": "Name"
+        },
+        {
+          "id": "fldq0D4a6GevQSbhz",
+          "name": "Resident"
+        },
+        {
+          "id": "fldSm2tVzmgKpwAMH",
+          "name": "Block"
+        },
+        {
+          "id": "fldxZH0CjlYJ8V4eW",
+          "name": "Rotation"
+        },
+        {
+          "id": "fldJVpmB8hCfR6u2j",
+          "name": "Notes"
+        },
+        {
+          "id": "fldPzPmCt5xRr9LXd",
+          "name": "Start Date"
+        },
+        {
+          "id": "fld7GHAvlhUBuNZAm",
+          "name": "End Date"
+        },
+        {
+          "id": "fldCQ0kP3xNtQRPbK",
+          "name": "Status"
+        },
+        {
+          "id": "fld1gvZ5vL0gkrJ4W",
+          "name": "PGY Year"
+        },
+        {
+          "id": "fldxfHj0DXhYEVGlD",
+          "name": "Half-Day Assignments"
+        },
+        {
+          "id": "fldAXvAJh4gSvEPmF",
+          "name": "Rotation Duration"
+        },
+        {
+          "id": "fldE5Db77xRAEPrFl",
+          "name": "Airtable Record ID"
+        }
+      ]
+    },
+    {
+      "id": "tblfqvE6iLYwRvJkM",
+      "name": "Resident Details",
+      "fields": [
+        {
+          "id": "fld1ZpUSZArfW99qs",
+          "name": "Name"
+        },
+        {
+          "id": "fld8A3CeVDXzhn2Bt",
+          "name": "PGY"
+        },
+        {
+          "id": "fld0VvsgtKBYHSiuo",
+          "name": "Specialty"
+        },
+        {
+          "id": "fldV9L9Lke6sE6hYJ",
+          "name": "Leave Dates"
+        },
+        {
+          "id": "fldBOhszIm9HupQRE",
+          "name": "Status"
+        },
+        {
+          "id": "fldikULUhCPbMx9x",
+          "name": "Notes"
+        },
+        {
+          "id": "fld9RQu4UFRFWZPrH",
+          "name": "Airtable Record ID"
+        }
+      ]
+    },
+    {
+      "id": "tbl2h0TDwPRMV5a1s",
+      "name": "Faculty Schedules",
+      "fields": [
+        {
+          "id": "fldluH5TeYEozvWhC",
+          "name": "Name"
+        },
+        {
+          "id": "fldZETfmu6w5aLFMj",
+          "name": "Specialty"
+        },
+        {
+          "id": "fldxWKlDa9UKFrJXf",
+          "name": "Availability"
+        },
+        {
+          "id": "fldpC6DqSJUoWOuui",
+          "name": "Notes"
+        },
+        {
+          "id": "fldMd09hO58yV8toj",
+          "name": "Airtable Record ID"
+        }
+      ]
+    },
+    {
+      "id": "tbl1dDmLfKdf7P4l0",
+      "name": "Rotation Catalog",
+      "fields": [
+        {
+          "id": "fld2jCaAg1kBMLSmN",
+          "name": "Rotation Name"
+        },
+        {
+          "id": "fld3msh9yK0QKxTLD",
+          "name": "Department"
+        },
+        {
+          "id": "fldef16VzboINLRUK",
+          "name": "Duration"
+        },
+        {
+          "id": "fldCVqDPHGbK7Hgc5",
+          "name": "Description"
+        },
+        {
+          "id": "fld30Z41PC95jIzyZ",
+          "name": "Notes"
+        },
+        {
+          "id": "fldug6gRNWMz9vFJe",
+          "name": "Airtable Record ID"
+        }
+      ]
+    },
+    {
+      "id": "tbl15U9cF0uig9IEo",
+      "name": "Call Schedule",
+      "fields": [
+        {
+          "id": "fldkrB8jaqIbNJgNZ",
+          "name": "Name"
+        },
+        {
+          "id": "fld9djV8F9P5OsDyM",
+          "name": "Date"
+        },
+        {
+          "id": "fldNCV31QV97lEWbs",
+          "name": "Shift"
+        },
+        {
+          "id": "fldWtV2JXWNSTnKBO",
+          "name": "Department"
+        },
+        {
+          "id": "fldAy30e9g3webrSm",
+          "name": "Resident"
+        },
+        {
+          "id": "fldAI1FPrEJLKqBtL",
+          "name": "Airtable Record ID"
+        }
+      ]
+    }
+  ]
+}
