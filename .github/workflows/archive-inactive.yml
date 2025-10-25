@@ -1,0 +1,21 @@
+name: Auto-archive inactive repos
+on:
+  schedule:
+    - cron: '0 3 1 * *'  # Run monthly on the 1st at 03:00 UTC
+jobs:
+  auto-archive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v6
+        with:
+          script: |
+            const cutoff = 180 * 24 * 60 * 60 * 1000; // 6 months
+            const org = '${{ github.repository_owner }}';
+            const repos = await github.paginate(github.rest.repos.listForOrg, { org });
+            for (const repo of repos) {
+              const lastUpdate = new Date(repo.updated_at);
+              if (!repo.archived && (Date.now() - lastUpdate) > cutoff) {
+                console.log(`Archiving ${repo.name}`);
+                await github.rest.repos.archive({ owner: org, repo: repo.name });
+              }
+            }
