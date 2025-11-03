@@ -50,7 +50,7 @@ phase2-smart-resident-association.json
         },
         "table": {
           "__rl": true,
-          "value": "tblResidencyBlockSchedule",
+          "value": "tbl3TfpZSGYGxLCIG",
           "mode": "id"
         },
         "filterByFormula": "=NOT(BLANK({Resident}))",
@@ -151,7 +151,7 @@ phase2-smart-resident-association.json
     {
       "parameters": {
         "method": "PATCH",
-        "url": "=https://api.airtable.com/v0/appDgFtrU7njCKDW5/Master%20Assignments/{{ $json.id }}",
+        "url": "=https://api.airtable.com/v0/appDgFtrU7njCKDW5/tbl17gcDUtXc14Rjv/{{ $json.id }}",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "airtableTokenApi",
         "sendBody": true,
