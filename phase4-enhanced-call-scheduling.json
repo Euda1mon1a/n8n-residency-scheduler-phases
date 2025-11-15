@@ -84,7 +84,7 @@ phase4-enhanced-call-scheduling.json
     {
       "parameters": {
         "method": "POST",
-        "url": "https://api.airtable.com/v0/appDgFtrU7njCKDW5/Call%20Assignments",
+        "url": "https://api.airtable.com/v0/appDgFtrU7njCKDW5/tbl15U9cF0uig9IEo",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "airtableTokenApi",
         "sendBody": true,

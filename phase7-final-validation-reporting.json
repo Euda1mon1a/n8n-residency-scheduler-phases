@@ -87,7 +87,7 @@ phase7-final-validation-reporting.json
         },
         "table": {
           "__rl": true,
-          "value": "tblCallAssignments",
+          "value": "tbl15U9cF0uig9IEo",
           "mode": "id"
         },
         "filterByFormula": "=NOT(BLANK({Faculty}))",
@@ -149,7 +149,7 @@ phase7-final-validation-reporting.json
         },
         "table": {
           "__rl": true,
-          "value": "tblResidencyBlockSchedule",
+          "value": "tbl3TfpZSGYGxLCIG",
           "mode": "id"
         },
         "filterByFormula": "=NOT(BLANK({Resident}))",
