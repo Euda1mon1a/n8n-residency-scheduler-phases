@@ -67,7 +67,7 @@ phase3-enhanced-faculty-assignment.json
     {
       "parameters": {
         "method": "POST",
-        "url": "https://api.airtable.com/v0/appDgFtrU7njCKDW5/Faculty%20Master%20Assignments",
+        "url": "https://api.airtable.com/v0/appDgFtrU7njCKDW5/tbloGnXnu0mC6y83L",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "airtableTokenApi",
         "sendBody": true,

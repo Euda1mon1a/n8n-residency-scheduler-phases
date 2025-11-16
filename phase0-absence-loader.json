@@ -50,7 +50,7 @@ phase0-absence-loader.json
         },
         "table": {
           "__rl": true,
-          "value": "tblResidentAbsences",
+          "value": "tblQl3C95p0UE6F0P",
           "mode": "id"
         },
         "filterByFormula": "=AND({Absence Approved} = TRUE(), {Absence Start} != BLANK(), {Absence End} != BLANK())",
@@ -106,7 +106,7 @@ phase0-absence-loader.json
         },
         "table": {
           "__rl": true,
-          "value": "tblResidencyBlockSchedule",
+          "value": "tbl3TfpZSGYGxLCIG",
           "mode": "id"
         },
         "filterByFormula": "=NOT(BLANK({Resident}))",
