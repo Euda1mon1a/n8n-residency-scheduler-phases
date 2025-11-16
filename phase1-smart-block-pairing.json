@@ -1,4 +1,3 @@
-phase1-smart-block-pairing.json
 {
   "name": "Medical Residency Scheduler - Phase 1: Smart Block Pairing (Absence-Aware)",
   "version": "2.0.0",
@@ -14,6 +13,94 @@ phase1-smart-block-pairing.json
       ],
       "id": "trigger-phase1-start",
       "name": "Start Phase 1: Smart Block Pairing"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appDgFtrU7njCKDW5",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblJvewumPqMBl6Ut",
+          "mode": "id"
+        },
+        "filterByFormula": "=AND({Leave Approved Residency} = TRUE(), {Leave Approved Army} = TRUE(), {Leave Start} != BLANK(), {Leave End} != BLANK())",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        100,
+        200
+      ],
+      "id": "fetch-approved-faculty-leave",
+      "name": "Fetch Approved Faculty Leave (Phase 0)",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jaswG7byACjIoa6L",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appDgFtrU7njCKDW5",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblQl3C95pOUE6FOP",
+          "mode": "id"
+        },
+        "filterByFormula": "=AND({Absence Approved} = TRUE(), {Absence Start} != BLANK(), {Absence End} != BLANK())",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        100,
+        100
+      ],
+      "id": "fetch-approved-resident-absences",
+      "name": "Fetch Approved Resident Absences (Phase 0)",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jaswG7byACjIoa6L",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 2
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        300,
+        150
+      ],
+      "id": "merge-phase0-data",
+      "name": "Merge Phase 0 Absence Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// PHASE 0: PROCESS ABSENCE DATA\nconst allItems = $input.all();\nconst facultyLeave = [];\nconst residentAbsences = [];\n\nallItems.forEach(item => {\n  const data = item.json;\n  if (data['Leave Start']) {\n    facultyLeave.push(data);\n  } else if (data['Absence Start']) {\n    residentAbsences.push(data);\n  }\n});\n\n// Create absence maps\nconst facultyAbsences = {};\nconst residentAbsences = {};\nconst facultyReference = {};\n\nfacultyLeave.forEach(leave => {\n  const facultyId = Array.isArray(leave.Faculty) ? leave.Faculty[0] : leave.Faculty;\n  const startDate = new Date(leave['Leave Start']);\n  const endDate = new Date(leave['Leave End']);\n  \n  if (!facultyAbsences[facultyId]) facultyAbsences[facultyId] = {};\n  \n  for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {\n    const dateStr = d.toISOString().split('T')[0];\n    facultyAbsences[facultyId][dateStr] = {\n      leaveType: leave['Leave Type'] || 'Leave',\n      timeOfDay: leave['Time of Day'] || 'All Day',\n      comments: leave['Comments'] || '',\n      replacementActivity: leave['Comments'] || leave['Leave Type'] || 'Leave'\n    };\n  }\n});\n\nreturn [{\n  json: {\n    phase: 0,\n    absence_data: {\n      facultyAbsences: facultyAbsences,\n      residentAbsences: residentAbsences,\n      facultyReference: facultyReference\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        150
+      ],
+      "id": "process-phase0-absences",
+      "name": "Process Phase 0 Absences"
     },
     {
       "parameters": {
@@ -220,6 +307,16 @@ phase1-smart-block-pairing.json
       "main": [
         [
           {
+            "node": "Fetch Approved Faculty Leave (Phase 0)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Approved Resident Absences (Phase 0)",
+            "type": "main",
+            "index": 0
+          },
+          {
             "node": "Fetch All Half-Days (Blocks 1-13)",
             "type": "main",
             "index": 0
@@ -233,6 +330,50 @@ phase1-smart-block-pairing.json
             "node": "Fetch Active Faculty for Availability Check",
             "type": "main",
             "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Approved Faculty Leave (Phase 0)": {
+      "main": [
+        [
+          {
+            "node": "Merge Phase 0 Absence Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Approved Resident Absences (Phase 0)": {
+      "main": [
+        [
+          {
+            "node": "Merge Phase 0 Absence Data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Phase 0 Absence Data": {
+      "main": [
+        [
+          {
+            "node": "Process Phase 0 Absences",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Phase 0 Absences": {
+      "main": [
+        [
+          {
+            "node": "Merge Phase 1 Data",
+            "type": "main",
+            "index": 3
           }
         ]
       ]
