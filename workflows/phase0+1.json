@@ -382,7 +382,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://api.airtable.com/v0/appDgFtrU7njCKDW5/Master%20Assignments",
+        "url": "https://api.airtable.com/v0/appDgFtrU7njCKDW5/tbl17gcDUtXc14Rjv",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "airtableTokenApi",
         "sendBody": true,
