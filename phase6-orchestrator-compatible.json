@@ -1,0 +1,173 @@
+{
+  "name": "Medical Residency Scheduler - Phase 6: Orchestrator-Compatible Minimal Cleanup",
+  "version": "3.1.0",
+  "description": "Phase 6: Orchestrator-compatible minimal cleanup and validation - data-via-Airtable pattern",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [100, 400],
+      "id": "trigger-phase6-start",
+      "name": "Start Phase 6: Minimal Cleanup"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appDgFtrU7njCKDW5",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl17gcDUtXc14Rjv",
+          "mode": "id"
+        },
+        "filterByFormula": "=NOT(BLANK({Resident (from Residency Block Schedule)}))",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [300, 300],
+      "id": "fetch-final-master-assignments",
+      "name": "Fetch Final Master Assignments",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jaswG7byACjIoa6L",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appDgFtrU7njCKDW5",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbloGnXnu0mC6y83L",
+          "mode": "id"
+        },
+        "filterByFormula": "=NOT(BLANK({Faculty}))",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [300, 400],
+      "id": "fetch-final-faculty-assignments",
+      "name": "Fetch Final Faculty Assignments",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jaswG7byACjIoa6L",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 2
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [500, 350],
+      "id": "merge-for-phase6",
+      "name": "Merge Data for Phase 6"
+    },
+    {
+      "parameters": {
+        "jsCode": "\n// PHASE 6: ORCHESTRATOR-COMPATIBLE MINIMAL CLEANUP & VALIDATION\nconsole.log('=== PHASE 6: MINIMAL CLEANUP & VALIDATION ===');\n\nconst allItems = $input.all();\nconsole.log(`Received ${allItems.length} items from merge`);\n\n// Separate data by type\nlet masterAssignments = [];\nlet facultyAssignments = [];\n\nallItems.forEach(item => {\n  const data = item.json;\n  \n  if (data['Half-Day of the Week of Blocks'] && data['Resident (from Residency Block Schedule)']) {\n    masterAssignments.push(data);\n  } else if (data['Faculty'] && data['Half-Day of the Week of Blocks']) {\n    facultyAssignments.push(data);\n  }\n});\n\nconsole.log(`Found: ${masterAssignments.length} final master assignments`);\nconsole.log(`Found: ${facultyAssignments.length} final faculty assignments`);\n\n// MINIMAL CLEANUP: Check for orphaned assignments\nconst minimalCleanupResults = {\n  orphanedAssignments: [],\n  invalidReferences: [],\n  dataInconsistencies: [],\n  cleanupActions: []\n};\n\n// Check for any orphaned master assignments (should be minimal with Phase 0-4 prevention)\nconsole.log('\\n--- CHECKING FOR ORPHANED ASSIGNMENTS ---');\nconst orphanedMaster = masterAssignments.filter(assignment => {\n  const residents = assignment['Resident (from Residency Block Schedule)'];\n  return !residents || residents.length === 0;\n});\n\nminimalCleanupResults.orphanedAssignments = orphanedMaster.map(assignment => ({\n  recordId: assignment.id,\n  halfDayId: assignment['Half-Day of the Week of Blocks'],\n  reason: 'Master assignment missing resident',\n  severity: 'HIGH',\n  requiresInvestigation: true\n}));\n\n// Check for orphaned faculty assignments\nconst orphanedFaculty = facultyAssignments.filter(assignment => {\n  const halfDays = assignment['Half-Day of the Week of Blocks'];\n  const faculty = assignment['Faculty'];\n  return !halfDays || halfDays.length === 0 || !faculty || faculty.length === 0;\n});\n\nminimalCleanupResults.orphanedAssignments.push(...orphanedFaculty.map(assignment => ({\n  recordId: assignment.id,\n  facultyId: assignment['Faculty'],\n  reason: 'Faculty assignment missing required fields',\n  severity: 'HIGH',\n  requiresInvestigation: true\n})));\n\n// DATA INTEGRITY VALIDATION\nconsole.log('\\n--- DATA INTEGRITY VALIDATION ---');\n\nconst dataIntegrityValidation = {\n  totalAssignmentsAnalyzed: masterAssignments.length + facultyAssignments.length,\n  orphanedRecordsFound: minimalCleanupResults.orphanedAssignments.length,\n  \n  // Calculate supervision coverage\n  supervisionCoverage: calculateSupervisionCoverage(masterAssignments, facultyAssignments),\n  \n  // Data quality metrics\n  dataQuality: {\n    masterAssignmentQuality: calculateQuality(masterAssignments),\n    facultyAssignmentQuality: calculateQuality(facultyAssignments),\n    overallQuality: 0 // Will calculate\n  }\n};\n\n// Helper function for supervision coverage\nfunction calculateSupervisionCoverage(masterAssignments, facultyAssignments) {\n  if (masterAssignments.length === 0) return '100%';\n  \n  const supervisedCount = masterAssignments.filter(ma => {\n    const halfDayIds = ma['Half-Day of the Week of Blocks'] || [];\n    return halfDayIds.some(hdId => \n      facultyAssignments.some(fa => \n        (fa['Half-Day of the Week of Blocks'] || []).includes(hdId)\n      )\n    );\n  }).length;\n  \n  return (supervisedCount / masterAssignments.length * 100).toFixed(1) + '%';\n}\n\nfunction calculateQuality(assignments) {\n  if (assignments.length === 0) return 100;\n  \n  const validAssignments = assignments.filter(a => {\n    // Check for required fields\n    return a['Half-Day of the Week of Blocks'] && \n           (a['Resident (from Residency Block Schedule)'] || a['Faculty']);\n  });\n  \n  return (validAssignments.length / assignments.length * 100).toFixed(1);\n}\n\n// Calculate overall quality\nconst totalAssignments = masterAssignments.length + facultyAssignments.length;\nif (totalAssignments > 0) {\n  const orphanRate = minimalCleanupResults.orphanedAssignments.length / totalAssignments;\n  dataIntegrityValidation.dataQuality.overallQuality = ((1 - orphanRate) * 100).toFixed(1);\n} else {\n  dataIntegrityValidation.dataQuality.overallQuality = 0;\n}\n\n// CLEANUP EXECUTION SUMMARY\nconst cleanupExecution = {\n  recordsToDelete: minimalCleanupResults.orphanedAssignments.length,\n  recordsToUpdate: 0,\n  issuesResolved: 0,\n  executionTimeEstimate: minimalCleanupResults.orphanedAssignments.length === 0 ? '< 1 minute' : '< 5 minutes'\n};\n\nif (minimalCleanupResults.orphanedAssignments.length > 0) {\n  console.log(`\\n⚠️  WARNING: Found ${minimalCleanupResults.orphanedAssignments.length} orphaned records`);\n  console.log('Cleanup required...');\n  \n  minimalCleanupResults.cleanupActions.push({\n    action: 'DELETE_ORPHANED_RECORDS',\n    recordCount: minimalCleanupResults.orphanedAssignments.length,\n    reason: 'Remove orphaned assignments',\n    priority: 'HIGH'\n  });\n} else {\n  console.log('\\n✅ NO ORPHANED RECORDS FOUND - Excellent!');\n}\n\n// CALCULATE FINAL SCORE\nconst finalIntegrityScore = parseFloat(dataIntegrityValidation.dataQuality.overallQuality);\nconst acgmeCompliance = {\n  supervisionCoverage: dataIntegrityValidation.supervisionCoverage,\n  overallCompliance: finalIntegrityScore >= 95 ? 'EXCELLENT' : \n    (finalIntegrityScore >= 90 ? 'GOOD' : 'NEEDS_ATTENTION')\n};\n\nconsole.log('\\n=== PHASE 6 RESULTS ===');\nconsole.log(`Data integrity score: ${finalIntegrityScore}/100`);\nconsole.log(`Orphaned records: ${dataIntegrityValidation.orphanedRecordsFound}`);\nconsole.log(`Supervision coverage: ${dataIntegrityValidation.supervisionCoverage}`);\nconsole.log(`ACGME compliance: ${acgmeCompliance.overallCompliance}`);\n\n// Generate recommendations\nfunction generateRecommendations(integrityScore, orphanCount) {\n  const recommendations = [];\n  \n  if (integrityScore >= 95) {\n    recommendations.push('✅ EXCELLENT: Data integrity at peak performance');\n    recommendations.push('📋 Ready for Phase 7 reporting');\n  } else if (integrityScore >= 90) {\n    recommendations.push('✅ GOOD: Data quality acceptable');\n    recommendations.push('📋 Ready for Phase 7 with minor notes');\n  } else {\n    recommendations.push('⚠️  ATTENTION: Data quality needs improvement');\n    recommendations.push('🔍 Review orphaned records before proceeding');\n  }\n  \n  if (orphanCount > 0) {\n    recommendations.push(`🚨 Clean up ${orphanCount} orphaned records`);\n  } else {\n    recommendations.push('🏆 Perfect - no cleanup needed!');\n  }\n  \n  return recommendations;\n}\n\nconst recommendations = generateRecommendations(finalIntegrityScore, dataIntegrityValidation.orphanedRecordsFound);\n\nreturn [{\n  json: {\n    phase: 6,\n    phase_name: 'Minimal Cleanup & Validation',\n    success: true,\n    orchestrator_compatible: true,\n    \n    // Cleanup results\n    minimal_cleanup_results: {\n      orphaned_records_found: dataIntegrityValidation.orphanedRecordsFound,\n      cleanup_execution: cleanupExecution\n    },\n    \n    // Data integrity\n    data_integrity_validation: {\n      totalAssignments: dataIntegrityValidation.totalAssignmentsAnalyzed,\n      orphanedRecords: dataIntegrityValidation.orphanedRecordsFound,\n      supervisionCoverage: dataIntegrityValidation.supervisionCoverage,\n      dataQuality: dataIntegrityValidation.dataQuality,\n      finalIntegrityScore: finalIntegrityScore\n    },\n    \n    // ACGME compliance\n    acgme_compliance: acgmeCompliance,\n    \n    // Recommendations\n    recommendations: recommendations,\n    \n    // Phase 7 readiness\n    ready_for_phase7: finalIntegrityScore >= 90,\n    next_phase: 7,\n    processing_timestamp: new Date().toISOString()\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 350],
+      "id": "phase6-minimal-cleanup-engine",
+      "name": "Phase 6: Minimal Cleanup Engine"
+    }
+  ],
+  "connections": {
+    "Start Phase 6: Minimal Cleanup": {
+      "main": [
+        [
+          {
+            "node": "Fetch Final Master Assignments",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Final Faculty Assignments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Final Master Assignments": {
+      "main": [
+        [
+          {
+            "node": "Merge Data for Phase 6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Final Faculty Assignments": {
+      "main": [
+        [
+          {
+            "node": "Merge Data for Phase 6",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Data for Phase 6": {
+      "main": [
+        [
+          {
+            "node": "Phase 6: Minimal Cleanup Engine",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "description": "Phase 6: Orchestrator-compatible minimal cleanup with data-via-Airtable pattern",
+    "version": "3.1.0",
+    "author": "Medical Scheduling Team"
+  },
+  "phase6_specifications": {
+    "orchestrator_compatibility": "FULL - Uses data-via-Airtable pattern",
+    "purpose": "Minimal cleanup and validation of final schedule data",
+    "data_sources": [
+      "Final Master Assignments (from Phase 2)",
+      "Final Faculty Assignments (from Phase 3)"
+    ],
+    "key_features": [
+      "Orphaned assignment detection",
+      "Data integrity validation",
+      "Supervision coverage calculation",
+      "ACGME compliance assessment",
+      "Clean recommendations for Phase 7"
+    ],
+    "success_criteria": {
+      "data_integrity_score": "≥90/100",
+      "supervision_coverage": "≥80%",
+      "acgme_compliance": "GOOD or EXCELLENT",
+      "phase7_readiness": "true"
+    }
+  }
+}

@@ -1,0 +1,315 @@
+{
+  "name": "Medical Residency Scheduler - Phase 7: Orchestrator-Compatible Final Validation",
+  "version": "3.0.0",
+  "description": "Phase 7: Orchestrator-compatible ACGME compliance validation and comprehensive reporting - data-via-Airtable pattern",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [100, 400],
+      "id": "trigger-phase7-start",
+      "name": "Start Phase 7: Final Validation"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appDgFtrU7njCKDW5",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl17gcDUtXc14Rjv",
+          "mode": "id"
+        },
+        "filterByFormula": "=NOT(BLANK({Resident (from Residency Block Schedule)}))",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [300, 200],
+      "id": "fetch-final-master-assignments",
+      "name": "Fetch Final Master Assignments",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jaswG7byACjIoa6L",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appDgFtrU7njCKDW5",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbloGnXnu0mC6y83L",
+          "mode": "id"
+        },
+        "filterByFormula": "=NOT(BLANK({Faculty}))",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [300, 300],
+      "id": "fetch-final-faculty-assignments",
+      "name": "Fetch Final Faculty Assignments",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jaswG7byACjIoa6L",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appDgFtrU7njCKDW5",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl15U9cF0uig9IEo",
+          "mode": "id"
+        },
+        "filterByFormula": "=NOT(BLANK({Faculty}))",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [300, 400],
+      "id": "fetch-final-call-assignments",
+      "name": "Fetch Final Call Assignments",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jaswG7byACjIoa6L",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appDgFtrU7njCKDW5",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblmgzodmqTsJ5inf",
+          "mode": "id"
+        },
+        "filterByFormula": "=AND({Faculty} != 'Van Brunt', {Faculty} != 'Napierala', {Faculty Status} != 'Inactive')",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [300, 500],
+      "id": "fetch-active-faculty-data",
+      "name": "Fetch Active Faculty Data",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jaswG7byACjIoa6L",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appDgFtrU7njCKDW5",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl3TfpZSGYGxLCIG",
+          "mode": "id"
+        },
+        "filterByFormula": "=NOT(BLANK({Resident}))",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [300, 600],
+      "id": "fetch-resident-data",
+      "name": "Fetch Resident Data",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jaswG7byACjIoa6L",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 5
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [500, 400],
+      "id": "merge-for-phase7",
+      "name": "Merge Data for Phase 7"
+    },
+    {
+      "parameters": {
+        "jsCode": "\n// PHASE 7: ORCHESTRATOR-COMPATIBLE FINAL VALIDATION & REPORTING\nconsole.log('=== PHASE 7: FINAL VALIDATION & REPORTING ===');\n\nconst allItems = $input.all();\nconsole.log(`Received ${allItems.length} items from merge`);\n\n// Separate data by type\nlet masterAssignments = [];\nlet facultyAssignments = [];\nlet callAssignments = [];\nlet activeFaculty = [];\nlet residents = [];\n\nallItems.forEach(item => {\n  const data = item.json;\n  \n  if (data['Half-Day of the Week of Blocks'] && data['Resident (from Residency Block Schedule)']) {\n    masterAssignments.push(data);\n  } else if (data['Faculty'] && data['Attending Clinic Templates']) {\n    facultyAssignments.push(data);\n  } else if (data['Call Date'] && data['Faculty']) {\n    callAssignments.push(data);\n  } else if (data['Faculty'] && data['Last Name'] && !data['Leave Start']) {\n    activeFaculty.push(data);\n  } else if (data['Resident'] && data['PGY Level']) {\n    residents.push(data);\n  }\n});\n\nconsole.log(`Master Assignments: ${masterAssignments.length}`);\nconsole.log(`Faculty Assignments: ${facultyAssignments.length}`);\nconsole.log(`Call Assignments: ${callAssignments.length}`);\nconsole.log(`Active Faculty: ${activeFaculty.length}`);\nconsole.log(`Residents: ${residents.length}`);\n\n// ACGME COMPLIANCE VALIDATION\nconsole.log('\\n=== ACGME COMPLIANCE VALIDATION ===');\n\n// 1. SUPERVISION RATIOS\nfunction validateSupervisionRatios() {\n  const supervisionByPGY = {};\n  \n  ['PGY-1', 'PGY-2', 'PGY-3'].forEach(pgy => {\n    const pgyAssignments = masterAssignments.filter(ma => \n      (ma['PGY Link (from Residency Block Schedule)'] || []).includes(pgy)\n    );\n    \n    const supervisedAssignments = pgyAssignments.filter(ma => {\n      const halfDayIds = ma['Half-Day of the Week of Blocks'] || [];\n      return halfDayIds.some(hdId => \n        facultyAssignments.some(fa => \n          (fa['Half-Day of the Week of Blocks'] || []).includes(hdId)\n        )\n      );\n    });\n    \n    const requiredRatio = pgy === 'PGY-1' ? 1.0 : 0.8;\n    const actualRatio = pgyAssignments.length > 0 ? \n      supervisedAssignments.length / pgyAssignments.length : 0;\n    \n    supervisionByPGY[pgy] = {\n      totalAssignments: pgyAssignments.length,\n      supervised: supervisedAssignments.length,\n      requiredRatio: (requiredRatio * 100).toFixed(0) + '%',\n      actualRatio: (actualRatio * 100).toFixed(1) + '%',\n      compliant: actualRatio >= requiredRatio\n    };\n  });\n  \n  return supervisionByPGY;\n}\n\n// 2. DUTY HOUR COMPLIANCE\nfunction validateDutyHours() {\n  const residentHours = {};\n  \n  // Count clinic/ward hours (8 hours per half-day)\n  masterAssignments.forEach(ma => {\n    const residentIds = ma['Resident (from Residency Block Schedule)'] || [];\n    residentIds.forEach(resId => {\n      residentHours[resId] = (residentHours[resId] || 0) + 8;\n    });\n  });\n  \n  // Add call hours (12 hours per call)\n  callAssignments.forEach(call => {\n    const facultyId = (call['Faculty'] || [])[0];\n    if (facultyId && residentHours[facultyId] !== undefined) {\n      residentHours[facultyId] += 12;\n    }\n  });\n  \n  const maxWeeklyHours = 80;\n  const hourCounts = Object.values(residentHours);\n  const violations = hourCounts.filter(h => h > maxWeeklyHours).length;\n  const avgHours = hourCounts.length > 0 ? \n    hourCounts.reduce((a, b) => a + b, 0) / hourCounts.length : 0;\n  \n  return {\n    maxAllowed: maxWeeklyHours,\n    averageHours: avgHours.toFixed(1),\n    violations: violations,\n    totalResidents: hourCounts.length,\n    complianceRate: hourCounts.length > 0 ? \n      (((hourCounts.length - violations) / hourCounts.length) * 100).toFixed(1) + '%' : '100%'\n  };\n}\n\n// 3. EDUCATIONAL REQUIREMENTS\nfunction validateEducationalRequirements() {\n  const educationalActivities = masterAssignments.filter(ma => {\n    const activities = ma['Activity (from Rotation Templates)'] || [];\n    return activities.some(act => \n      act.toLowerCase().includes('conference') ||\n      act.toLowerCase().includes('education') ||\n      act.toLowerCase().includes('lecture') ||\n      act.toLowerCase().includes('didactic')\n    );\n  });\n  \n  const total = masterAssignments.length;\n  const educational = educationalActivities.length;\n  const rate = total > 0 ? (educational / total) : 0;\n  const requiredRate = 0.15; // 15% minimum\n  \n  return {\n    educationalActivities: educational,\n    totalAssignments: total,\n    actualRate: (rate * 100).toFixed(1) + '%',\n    requiredRate: '15.0%',\n    compliant: rate >= requiredRate\n  };\n}\n\n// 4. FACULTY WELLNESS (Call Distribution)\nfunction validateFacultyWellness() {\n  const facultyCallCounts = {};\n  \n  callAssignments.forEach(call => {\n    const facultyId = (call['Faculty'] || [])[0];\n    if (facultyId) {\n      facultyCallCounts[facultyId] = (facultyCallCounts[facultyId] || 0) + 1;\n    }\n  });\n  \n  const callCounts = Object.values(facultyCallCounts);\n  const maxCallsPerMonth = 8;\n  const overworked = callCounts.filter(c => c > maxCallsPerMonth).length;\n  const avgCalls = callCounts.length > 0 ? \n    callCounts.reduce((a, b) => a + b, 0) / callCounts.length : 0;\n  \n  return {\n    maxCallsAllowed: maxCallsPerMonth,\n    averageCalls: avgCalls.toFixed(1),\n    overworkedFaculty: overworked,\n    totalFacultyWithCalls: callCounts.length,\n    complianceRate: callCounts.length > 0 ? \n      (((callCounts.length - overworked) / callCounts.length) * 100).toFixed(1) + '%' : '100%'\n  };\n}\n\n// Execute validations\nconst supervisionCompliance = validateSupervisionRatios();\nconst dutyHourCompliance = validateDutyHours();\nconst educationalCompliance = validateEducationalRequirements();\nconst wellnessCompliance = validateFacultyWellness();\n\n// Calculate overall ACGME score\nfunction calculateOverallScore() {\n  // Supervision score (average across PGY levels)\n  const supervisionScores = Object.values(supervisionCompliance).map(s => \n    s.compliant ? 100 : parseFloat(s.actualRatio)\n  );\n  const supervisionScore = supervisionScores.reduce((a, b) => a + b, 0) / supervisionScores.length;\n  \n  // Duty hour score\n  const dutyHourScore = parseFloat(dutyHourCompliance.complianceRate);\n  \n  // Educational score\n  const educationalScore = educationalCompliance.compliant ? 100 : \n    parseFloat(educationalCompliance.actualRate);\n  \n  // Wellness score\n  const wellnessScore = parseFloat(wellnessCompliance.complianceRate);\n  \n  // Weighted average (supervision 40%, duty hours 30%, education 20%, wellness 10%)\n  return (supervisionScore * 0.4 + dutyHourScore * 0.3 + \n          educationalScore * 0.2 + wellnessScore * 0.1).toFixed(1);\n}\n\nconst overallScore = calculateOverallScore();\nconst scoreNum = parseFloat(overallScore);\nconst overallGrade = scoreNum >= 95 ? 'A+ (Excellent)' :\n                     scoreNum >= 90 ? 'A (Very Good)' :\n                     scoreNum >= 85 ? 'B+ (Good)' :\n                     scoreNum >= 80 ? 'B (Acceptable)' : 'C (Needs Improvement)';\n\n// FACULTY UTILIZATION ANALYSIS\nconsole.log('\\n=== FACULTY UTILIZATION ANALYSIS ===');\n\nconst facultyUtilization = {};\nactiveFaculty.forEach(faculty => {\n  const facultyId = faculty.id;\n  const name = faculty.Faculty || faculty['Last Name'];\n  \n  // Count assignments\n  const supervision = facultyAssignments.filter(fa => \n    (fa['Faculty'] || []).includes(facultyId)\n  ).length;\n  \n  const calls = callAssignments.filter(ca => \n    (ca['Faculty'] || []).includes(facultyId)\n  ).length;\n  \n  // Estimate capacity\n  const availableDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']\n    .filter(day => faculty[`Available ${day}`] === true).length;\n  const capacity = availableDays * 2 * 4; // 2 half-days × 4 weeks\n  \n  facultyUtilization[facultyId] = {\n    name: name,\n    supervisionAssignments: supervision,\n    callAssignments: calls,\n    totalAssignments: supervision + calls,\n    estimatedCapacity: capacity,\n    utilizationRate: capacity > 0 ? \n      (((supervision + calls) / capacity) * 100).toFixed(1) + '%' : '0%',\n    wellBalanced: capacity > 0 && \n      ((supervision + calls) / capacity) >= 0.5 && \n      ((supervision + calls) / capacity) <= 0.9\n  };\n});\n\n// SYSTEM EFFICIENCY METRICS\nconst efficiencyMetrics = {\n  totalMasterAssignments: masterAssignments.length,\n  totalFacultyAssignments: facultyAssignments.length,\n  totalCallAssignments: callAssignments.length,\n  supervisionCoverageRate: masterAssignments.length > 0 ? \n    ((facultyAssignments.length / masterAssignments.length) * 100).toFixed(1) + '%' : '0%',\n  overallEfficiency: masterAssignments.length > 0 ? \n    (((facultyAssignments.length + callAssignments.length) / (masterAssignments.length * 2)) * 100).toFixed(1) + '%' : '0%'\n};\n\n// DEPLOYMENT READINESS\nconst deploymentReady = {\n  acgmeCompliant: scoreNum >= 85,\n  supervisionAdequate: Object.values(supervisionCompliance).every(s => s.compliant),\n  dutyHoursCompliant: parseFloat(dutyHourCompliance.complianceRate) >= 90,\n  educationalAdequate: educationalCompliance.compliant,\n  wellnessAcceptable: parseFloat(wellnessCompliance.complianceRate) >= 80,\n  overallRecommendation: scoreNum >= 90 ? 'APPROVED FOR PRODUCTION' : \n                        scoreNum >= 85 ? 'APPROVED WITH MONITORING' : \n                        'REQUIRES ATTENTION BEFORE DEPLOYMENT'\n};\n\nconst allCriteriaMinimumMet = Object.values(deploymentReady).slice(0, -1).filter(v => v === true).length >= 4;\n\nconsole.log('\\n=== VALIDATION RESULTS ===');\nconsole.log(`ACGME Compliance Score: ${overallScore}% (${overallGrade})`);\nconsole.log(`Deployment Status: ${deploymentReady.overallRecommendation}`);\nconsole.log(`Supervision Compliance: ${Object.values(supervisionCompliance).every(s => s.compliant) ? 'PASS' : 'REVIEW'}`);\nconsole.log(`Duty Hour Compliance: ${dutyHourCompliance.complianceRate}`);\nconsole.log(`Educational Requirements: ${educationalCompliance.compliant ? 'MET' : 'BELOW THRESHOLD'}`);\nconsole.log(`Faculty Wellness: ${wellnessCompliance.complianceRate}`);\n\n// FINAL REPORT\nconst validationReport = {\n  reportHeader: {\n    title: 'Medical Residency Scheduling - Final Validation Report',\n    date: new Date().toISOString().split('T')[0],\n    version: '3.0.0 - Orchestrator Compatible',\n    assessmentType: 'ACGME Compliance & Deployment Readiness'\n  },\n  \n  executiveSummary: {\n    overallScore: overallScore + '%',\n    overallGrade: overallGrade,\n    deploymentRecommendation: deploymentReady.overallRecommendation,\n    totalAssignments: masterAssignments.length,\n    totalFaculty: activeFaculty.length,\n    totalResidents: residents.length,\n    orchestratorCompatible: true\n  },\n  \n  acgmeCompliance: {\n    supervisionCompliance: supervisionCompliance,\n    dutyHourCompliance: dutyHourCompliance,\n    educationalRequirements: educationalCompliance,\n    wellnessRequirements: wellnessCompliance,\n    overallScore: overallScore,\n    overallGrade: overallGrade\n  },\n  \n  utilizationAnalysis: {\n    facultyUtilization: facultyUtilization,\n    efficiencyMetrics: efficiencyMetrics\n  },\n  \n  deploymentReadiness: deploymentReady,\n  \n  recommendations: generateRecommendations(scoreNum, deploymentReady)\n};\n\nfunction generateRecommendations(score, readiness) {\n  const recommendations = [];\n  \n  if (score >= 95) {\n    recommendations.push('✅ Excellent ACGME compliance achieved');\n    recommendations.push('🚀 Ready for immediate production deployment');\n  } else if (score >= 90) {\n    recommendations.push('✅ Strong ACGME compliance');\n    recommendations.push('📊 Ready for deployment with standard monitoring');\n  } else if (score >= 85) {\n    recommendations.push('⚠️  Acceptable compliance with areas for improvement');\n    recommendations.push('📋 Deploy with enhanced monitoring');\n  } else {\n    recommendations.push('🚨 Review compliance gaps before deployment');\n    recommendations.push('🔧 Address deficiencies in flagged areas');\n  }\n  \n  if (!readiness.supervisionAdequate) {\n    recommendations.push('⚠️  Review supervision ratios, especially for PGY-1');\n  }\n  \n  if (!readiness.dutyHoursCompliant) {\n    recommendations.push('⚠️  Address duty hour violations');\n  }\n  \n  if (!readiness.educationalAdequate) {\n    recommendations.push('📚 Increase educational activity allocation');\n  }\n  \n  if (!readiness.wellnessAcceptable) {\n    recommendations.push('💼 Rebalance faculty call distribution');\n  }\n  \n  recommendations.push('📈 Continue monitoring and optimization');\n  \n  return recommendations;\n}\n\nreturn [{\n  json: {\n    phase: 7,\n    phase_name: 'Final Validation & Reporting',\n    success: true,\n    orchestrator_compatible: true,\n    validation_report: validationReport,\n    ready_for_deployment: allCriteriaMinimumMet,\n    processing_timestamp: new Date().toISOString()\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 400],
+      "id": "phase7-validation-engine",
+      "name": "Phase 7: Final Validation Engine"
+    }
+  ],
+  "connections": {
+    "Start Phase 7: Final Validation": {
+      "main": [
+        [
+          {
+            "node": "Fetch Final Master Assignments",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Final Faculty Assignments",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Final Call Assignments",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Active Faculty Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Resident Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Final Master Assignments": {
+      "main": [
+        [
+          {
+            "node": "Merge Data for Phase 7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Final Faculty Assignments": {
+      "main": [
+        [
+          {
+            "node": "Merge Data for Phase 7",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Fetch Final Call Assignments": {
+      "main": [
+        [
+          {
+            "node": "Merge Data for Phase 7",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Fetch Active Faculty Data": {
+      "main": [
+        [
+          {
+            "node": "Merge Data for Phase 7",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Fetch Resident Data": {
+      "main": [
+        [
+          {
+            "node": "Merge Data for Phase 7",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "Merge Data for Phase 7": {
+      "main": [
+        [
+          {
+            "node": "Phase 7: Final Validation Engine",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "description": "Phase 7: Comprehensive ACGME validation and reporting with orchestrator compatibility",
+    "version": "3.0.0",
+    "author": "Medical Scheduling Team"
+  },
+  "phase7_specifications": {
+    "orchestrator_compatibility": "FULL - Uses data-via-Airtable pattern",
+    "purpose": "Final ACGME compliance validation and comprehensive reporting for production deployment",
+    "data_sources": [
+      "Final Master Assignments (Phase 2 output)",
+      "Final Faculty Assignments (Phase 3 output)",
+      "Final Call Assignments (Phase 4 output)",
+      "Active Faculty Data",
+      "Resident Data"
+    ],
+    "key_validations": {
+      "supervision_ratios": "PGY-1: 100%, PGY-2/3: 80% minimum",
+      "duty_hour_compliance": "80-hour weekly limit",
+      "educational_requirements": "15% minimum educational activities",
+      "faculty_wellness": "8 calls/month maximum per faculty"
+    },
+    "success_criteria": {
+      "acgme_compliance_score": "≥85% for deployment approval",
+      "supervision_adequate": "All PGY levels meet minimum ratios",
+      "duty_hours_compliant": "≥90% residents within limits",
+      "educational_adequate": "≥15% educational activities",
+      "wellness_acceptable": "≥80% faculty within call limits"
+    },
+    "outputs": [
+      "Comprehensive ACGME compliance report",
+      "Faculty utilization analysis",
+      "System efficiency metrics",
+      "Deployment readiness assessment",
+      "Actionable recommendations"
+    ]
+  }
+}
