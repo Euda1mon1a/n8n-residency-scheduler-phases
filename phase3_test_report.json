@@ -1,0 +1,81 @@
+{
+  "test_metadata": {
+    "test_date": "2025-11-17T08:07:04.985793",
+    "phase_tested": 3,
+    "phase_name": "Enhanced Faculty Assignment (Python)",
+    "test_type": "Mock Data Validation"
+  },
+  "test_data_summary": {
+    "faculty_count": 10,
+    "master_assignments": 20,
+    "clinic_templates": 4,
+    "faculty_with_absences": 3,
+    "total_input_items": 36
+  },
+  "execution_results": {
+    "success": true,
+    "faculty_assignments_created": 17,
+    "absence_substitutions": 0,
+    "coverage_gaps": 3,
+    "acgme_compliance_rate": "85.0%",
+    "faculty_utilized": 10
+  },
+  "validation_summary": {
+    "tests_passed": 13,
+    "tests_failed": 0,
+    "warnings": 0,
+    "total_tests": 13
+  },
+  "detailed_validations": {
+    "passed": [
+      "Output contains correct phase number",
+      "Execution reported success",
+      "Output contains faculty assignments",
+      "Faculty assignments created (17 assignments)",
+      "Faculty assignments not exceeding master assignments",
+      "ACGME compliance rate calculated",
+      "ACGME compliance rate acceptable (85.0%)",
+      "Phase 0 absence integration tracked",
+      "Absence-aware assignments counted",
+      "Faculty utilization calculated (10 faculty)",
+      "Assignment structure complete",
+      "Phase integration metadata present",
+      "Python conversion acknowledged in output"
+    ],
+    "failed": [],
+    "warnings": []
+  },
+  "analysis": {
+    "supervision_types": {
+      "direct": 4,
+      "indirect": 13
+    },
+    "pgy_distribution": {
+      "PGY-1": 4,
+      "PGY-2": 7,
+      "PGY-3": 6
+    },
+    "top_utilized_faculty": [
+      {
+        "name": "Dr. John Smith",
+        "assignments": 2,
+        "utilization": "25.0%"
+      },
+      {
+        "name": "Dr. Sarah Johnson",
+        "assignments": 2,
+        "utilization": "25.0%"
+      },
+      {
+        "name": "Dr. Michael Williams",
+        "assignments": 2,
+        "utilization": "20.0%"
+      }
+    ]
+  },
+  "overall_result": {
+    "status": "PASS",
+    "pass_rate": "100.0%",
+    "recommendation": "Ready for deployment"
+  }
+}
