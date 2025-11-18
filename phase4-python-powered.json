@@ -1,0 +1,206 @@
+{
+  "name": "Phase 4: Python-Powered Call Scheduling (Orchestrator-Ready)",
+  "version": "3.0.0",
+  "description": "Phase 4 with Python for advanced call scheduling algorithms and orchestrator compatibility",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [100, 400],
+      "id": "trigger-phase4",
+      "name": "Start Phase 4"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appDgFtrU7njCKDW5",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblmgzodmqTsJ5inf",
+          "mode": "id"
+        },
+        "filterByFormula": "=AND({Faculty} != 'Van Brunt', {Faculty} != 'Napierala', {Faculty Status} != 'Inactive')",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [300, 300],
+      "id": "fetch-faculty",
+      "name": "Fetch Faculty with Call History",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jaswG7byACjIoa6L",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appDgFtrU7njCKDW5",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblJvewumPqMBl6Ut",
+          "mode": "id"
+        },
+        "filterByFormula": "=AND({Leave Approved Residency} = TRUE(), {Leave Approved Army} = TRUE())",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [300, 400],
+      "id": "fetch-faculty-leave",
+      "name": "Fetch Faculty Leave",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jaswG7byACjIoa6L",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 2
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [500, 350],
+      "id": "merge-all-data",
+      "name": "Merge All Data"
+    },
+    {
+      "parameters": {
+        "pythonCode": "# PYTHON-POWERED CALL SCHEDULING ENGINE\nimport json\nfrom datetime import datetime, timedelta\nfrom typing import Dict, List, Optional, Tuple\nimport math\n\n# Get input data\ninput_items = _get_input_all()\n\nfaculty_data = []\nfaculty_leave = []\n\nfor item in input_items:\n    data = item['json']\n    \n    if 'Faculty' in data and 'Total Monday Call' in data:\n        faculty_data.append(data)\n    elif 'Leave Start' in data and 'Leave End' in data:\n        faculty_leave.append(data)\n\nprint(f\"=== PHASE 4: PYTHON-POWERED CALL SCHEDULING ===\")\nprint(f\"Faculty members: {len(faculty_data)}\")\nprint(f\"Leave records: {len(faculty_leave)}\")\n\nclass CallSchedulingEngine:\n    \"\"\"Advanced call scheduling with equity management and absence awareness\"\"\"\n    \n    def __init__(self, faculty_list: List[Dict], leave_records: List[Dict],\n                 config: Dict):\n        self.faculty = {f['id']: self._enhance_faculty_profile(f) for f in faculty_list}\n        self.absence_calendar = self._process_absences(leave_records)\n        self.config = config\n        self.assignments = []\n        self.faculty_last_call = {}\n        self.substitutions = []\n        self.gaps = []\n    \n    def _enhance_faculty_profile(self, faculty: Dict) -> Dict:\n        \"\"\"Create enhanced faculty profile with call history\"\"\"\n        return {\n            'id': faculty['id'],\n            'name': faculty.get('Faculty', faculty.get('Last Name', 'Unknown')),\n            'call_counts': {\n                'monday': faculty.get('Total Monday Call', 0),\n                'tuesday': faculty.get('Total Tuesday Call', 0),\n                'wednesday': faculty.get('Total Wednesday Call', 0),\n                'thursday': faculty.get('Total Thursday Call', 0),\n                'friday': faculty.get('Total Friday Call', 0),\n                'saturday': faculty.get('Total Saturday Call', 0),\n                'sunday': faculty.get('Total Sunday Call', 0)\n            },\n            'total_calls': sum([\n                faculty.get('Total Monday Call', 0),\n                faculty.get('Total Tuesday Call', 0),\n                faculty.get('Total Wednesday Call', 0),\n                faculty.get('Total Thursday Call', 0),\n                faculty.get('Total Friday Call', 0),\n                faculty.get('Total Saturday Call', 0),\n                faculty.get('Total Sunday Call', 0)\n            ]),\n            'inpatient_weeks': faculty.get('Total Inpatient Weeks', 0),\n            'is_active': faculty.get('Faculty Status', 'Active') != 'Inactive'\n        }\n    \n    def _process_absences(self, leave_records: List[Dict]) -> Dict[str, Dict[str, Dict]]:\n        \"\"\"Process faculty leave into absence calendar\"\"\"\n        calendar = {}\n        \n        for leave in leave_records:\n            faculty_ids = leave.get('Faculty', [])\n            start = datetime.fromisoformat(leave['Leave Start'].replace('Z', '+00:00'))\n            end = datetime.fromisoformat(leave['Leave End'].replace('Z', '+00:00'))\n            \n            current = start\n            while current <= end:\n                date_str = current.strftime('%Y-%m-%d')\n                \n                for fac_id in faculty_ids:\n                    if fac_id not in calendar:\n                        calendar[fac_id] = {}\n                    \n                    calendar[fac_id][date_str] = {\n                        'leave_type': leave.get('Leave Type', 'Leave'),\n                        'comments': leave.get('Comments', ''),\n                        'replacement': leave.get('Comments', '') or 'Leave'\n                    }\n                \n                current += timedelta(days=1)\n        \n        return calendar\n    \n    def is_faculty_available(self, faculty_id: str, date: str) -> bool:\n        \"\"\"Check if faculty available for call on specific date\"\"\"\n        if faculty_id not in self.faculty or not self.faculty[faculty_id]['is_active']:\n            return False\n        \n        # Check absence calendar\n        if faculty_id in self.absence_calendar:\n            if date in self.absence_calendar[faculty_id]:\n                return False\n        \n        return True\n    \n    def calculate_equity_score(self, faculty_id: str) -> float:\n        \"\"\"Calculate equity score (lower is more fair to assign)\"\"\"\n        faculty = self.faculty[faculty_id]\n        avg_calls = sum(f['total_calls'] for f in self.faculty.values()) / len(self.faculty)\n        \n        equity_score = faculty['total_calls'] - avg_calls\n        \n        # Adjust for absences (faculty with more absences get lower scores)\n        absence_count = len(self.absence_calendar.get(faculty_id, {}))\n        equity_score -= (absence_count * 0.1)\n        \n        return equity_score\n    \n    def calculate_gap_penalty(self, faculty_id: str, date: str) -> float:\n        \"\"\"Calculate penalty for gap violations (min 3 days between calls)\"\"\"\n        if faculty_id not in self.faculty_last_call:\n            return 0.0\n        \n        last_call = datetime.fromisoformat(self.faculty_last_call[faculty_id])\n        current_date = datetime.fromisoformat(date)\n        \n        days_between = (current_date - last_call).days\n        \n        if days_between < self.config['minimum_gap_days']:\n            # Exponential penalty for gap violations\n            return math.pow(self.config['minimum_gap_days'] - days_between + 1, 3)\n        \n        return 0.0\n    \n    def score_faculty_for_call(self, faculty_id: str, date: str, is_weekend: bool, \n                                is_holiday: bool) -> float:\n        \"\"\"Calculate total score for assigning faculty to call (lower is better)\"\"\"\n        # Gap penalty (70% weight)\n        gap_penalty = self.calculate_gap_penalty(faculty_id, date) * 0.7\n        \n        # Equity penalty (30% weight)\n        equity_score = self.calculate_equity_score(faculty_id)\n        call_weight = (self.config['holiday_weight'] if is_holiday \n                      else self.config['weekend_weight'] if is_weekend \n                      else 1.0)\n        equity_penalty = (equity_score + call_weight) * 0.3\n        \n        return gap_penalty + equity_penalty\n    \n    def assign_call(self, date: str, day_of_week: str, is_weekend: bool, \n                   is_holiday: bool) -> Optional[Dict]:\n        \"\"\"Assign call for specific date\"\"\"\n        call_weight = (self.config['holiday_weight'] if is_holiday \n                      else self.config['weekend_weight'] if is_weekend \n                      else 1.0)\n        \n        # Get available faculty\n        available = [fid for fid in self.faculty.keys() \n                    if self.is_faculty_available(fid, date)]\n        \n        if not available:\n            # Check for substitution opportunities\n            absent_with_replacement = [\n                fid for fid in self.faculty.keys()\n                if fid in self.absence_calendar and date in self.absence_calendar[fid]\n                and self.absence_calendar[fid][date]['replacement']\n            ]\n            \n            if absent_with_replacement:\n                faculty_id = absent_with_replacement[0]\n                absence_info = self.absence_calendar[faculty_id][date]\n                \n                assignment = {\n                    'date': date,\n                    'day_of_week': day_of_week,\n                    'faculty_id': faculty_id,\n                    'faculty_name': self.faculty[faculty_id]['name'],\n                    'call_type': absence_info['replacement'],\n                    'original_call_type': 'Overnight Call',\n                    'is_weekend': is_weekend,\n                    'is_holiday': is_holiday,\n                    'call_weight': call_weight,\n                    'substitution_applied': True,\n                    'absence_type': absence_info['leave_type'],\n                    'python_powered': True\n                }\n                \n                self.assignments.append(assignment)\n                self.substitutions.append(assignment)\n                return assignment\n            \n            # No faculty available - create gap\n            self.gaps.append({\n                'date': date,\n                'day_of_week': day_of_week,\n                'reason': 'All faculty absent',\n                'is_weekend': is_weekend,\n                'is_holiday': is_holiday\n            })\n            return None\n        \n        # Score all available faculty\n        scored = [\n            (fid, self.score_faculty_for_call(fid, date, is_weekend, is_holiday))\n            for fid in available\n        ]\n        scored.sort(key=lambda x: x[1])\n        \n        # Assign to best scoring faculty\n        faculty_id = scored[0][0]\n        penalty_score = scored[0][1]\n        \n        gap_days = None\n        if faculty_id in self.faculty_last_call:\n            last_call = datetime.fromisoformat(self.faculty_last_call[faculty_id])\n            current_date = datetime.fromisoformat(date)\n            gap_days = (current_date - last_call).days\n        \n        assignment = {\n            'date': date,\n            'day_of_week': day_of_week,\n            'faculty_id': faculty_id,\n            'faculty_name': self.faculty[faculty_id]['name'],\n            'call_type': 'Overnight Call',\n            'is_weekend': is_weekend,\n            'is_holiday': is_holiday,\n            'call_weight': call_weight,\n            'penalty_score': penalty_score,\n            'gap_days': gap_days,\n            'substitution_applied': False,\n            'python_powered': True\n        }\n        \n        # Update state\n        self.faculty_last_call[faculty_id] = date\n        self.faculty[faculty_id]['total_calls'] += call_weight\n        \n        self.assignments.append(assignment)\n        return assignment\n    \n    def generate_call_schedule(self, start_date: str, weeks: int = 4) -> Dict:\n        \"\"\"Generate call schedule for specified period\"\"\"\n        print(f\"\\nGenerating {weeks}-week call schedule starting {start_date}\")\n        \n        start = datetime.fromisoformat(start_date)\n        \n        for week in range(weeks):\n            for day in range(7):\n                current_date = start + timedelta(weeks=week, days=day)\n                date_str = current_date.strftime('%Y-%m-%d')\n                day_name = current_date.strftime('%A').lower()\n                is_weekend = day_name in ['saturday', 'sunday']\n                is_holiday = self._is_holiday(current_date)\n                \n                self.assign_call(date_str, day_name, is_weekend, is_holiday)\n            \n            print(f\"  Week {week + 1} complete\")\n        \n        # Calculate statistics\n        stats = {\n            'total_dates': weeks * 7,\n            'successful_assignments': len([a for a in self.assignments if not a.get('substitution_applied')]),\n            'substitutions': len(self.substitutions),\n            'gaps': len(self.gaps),\n            'coverage_rate': f\"{(len(self.assignments) / (weeks * 7) * 100):.1f}%\",\n            'substitution_rate': f\"{(len(self.substitutions) / max(len(self.assignments), 1) * 100):.1f}%\",\n            'gap_violations': sum(1 for a in self.assignments \n                                 if a.get('gap_days') and a['gap_days'] < self.config['minimum_gap_days'])\n        }\n        \n        return {\n            'assignments': self.assignments,\n            'substitutions': self.substitutions,\n            'gaps': self.gaps,\n            'statistics': stats,\n            'faculty_utilization': [\n                {'faculty_id': fid, 'faculty_name': f['name'], 'total_calls': f['total_calls']}\n                for fid, f in self.faculty.items()\n            ]\n        }\n    \n    def _is_holiday(self, date: datetime) -> bool:\n        \"\"\"Check if date is a major holiday\"\"\"\n        return (\n            (date.month == 12 and date.day == 25) or  # Christmas\n            (date.month == 1 and date.day == 1) or     # New Year\n            (date.month == 7 and date.day == 4) or     # July 4th\n            (date.month == 11 and date.day == 11)      # Veterans Day\n        )\n\n# Configuration\nconfig = {\n    'minimum_gap_days': 3,\n    'weekend_weight': 1.5,\n    'holiday_weight': 2.0,\n    'max_calls_per_month': 8\n}\n\n# Initialize engine\nengine = CallSchedulingEngine(faculty_data, faculty_leave, config)\n\n# Generate schedule (4 weeks)\nstart_date = (datetime.now() + timedelta(days=7 - datetime.now().weekday())).strftime('%Y-%m-%d')\nresult = engine.generate_call_schedule(start_date, weeks=4)\n\nprint(\"\\n=== PHASE 4 PYTHON RESULTS ===\")\nprint(f\"Call assignments: {result['statistics']['successful_assignments']}\")\nprint(f\"Substitutions: {result['statistics']['substitutions']}\")\nprint(f\"Coverage gaps: {result['statistics']['gaps']}\")\nprint(f\"Coverage rate: {result['statistics']['coverage_rate']}\")\nprint(f\"Gap violations: {result['statistics']['gap_violations']}\")\n\n# Show sample assignments\nif result['assignments']:\n    print(\"\\n=== SAMPLE CALL ASSIGNMENTS ===\")\n    for idx, assignment in enumerate(result['assignments'][:7]):\n        status = ' [SUB]' if assignment.get('substitution_applied') else ''\n        print(f\"{assignment['date']} ({assignment['day_of_week']}): {assignment['faculty_name']}{status}\")\n\n# Return to n8n\nreturn_value = {\n    'phase': 4,\n    'phase_name': 'Python-Powered Call Scheduling',\n    'success': True,\n    'enhanced_call_assignments': result['assignments'],\n    'substitutions': result['substitutions'],\n    'coverage_gaps': result['gaps'],\n    'statistics': result['statistics'],\n    'faculty_utilization': result['faculty_utilization'],\n    'python_powered': True,\n    'orchestrator_ready': True,\n    'next_phase': 6,\n    'processing_timestamp': datetime.now().isoformat()\n}\n\nreturn_value\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 350],
+      "id": "python-call-scheduling-engine",
+      "name": "Python Call Scheduling Engine",
+      "notes": "Advanced call scheduling with Python"
+    },
+    {
+      "parameters": {
+        "jsCode": "// FORMAT FOR AIRTABLE\nconst input = $input.first().json;\nconst callAssignments = input.enhanced_call_assignments.filter(a => a.faculty_id);\n\nconsole.log(`Formatting ${callAssignments.length} Python-powered call assignments`);\n\nconst airtableRecords = callAssignments.map(assignment => ({\n  fields: {\n    'Faculty': [assignment.faculty_id],\n    'Call Date': assignment.date,\n    'Day of Week': assignment.day_of_week,\n    'Call Type': assignment.call_type,\n    'Is Weekend': assignment.is_weekend,\n    'Is Holiday': assignment.is_holiday,\n    'Call Weight': assignment.call_weight,\n    'Gap Days': assignment.gap_days || 0,\n    'Penalty Score': assignment.penalty_score || 0,\n    'Substitution Applied': assignment.substitution_applied,\n    'Python Powered': assignment.python_powered,\n    'Processing Phase': 'Phase 4 - Python/Pyodide'\n  }\n}));\n\nreturn airtableRecords.map(record => ({ json: record }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 350],
+      "id": "format-for-airtable",
+      "name": "Format for Airtable"
+    },
+    {
+      "parameters": {
+        "batchSize": 10,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [1100, 350],
+      "id": "batch-records",
+      "name": "Batch Records"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [1300, 350],
+      "id": "wait-rate-limit",
+      "name": "Wait",
+      "webhookId": "phase4-python-wait"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.airtable.com/v0/appDgFtrU7njCKDW5/tbl15U9cF0uig9IEo",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "airtableTokenApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"records\": [{{ JSON.stringify($json) }}]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1500, 350],
+      "id": "create-call-assignments",
+      "name": "Create Call Assignments",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jaswG7byACjIoa6L",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// COMPLETION SUMMARY\nconst pythonResults = $('Python Call Scheduling Engine').first().json;\nconst airtableResults = $input.all();\n\nconst successfulCreations = airtableResults.filter(r => r.json && r.json.records).length;\n\nconsole.log('=== PHASE 4 COMPLETE (PYTHON-POWERED) ===');\nconsole.log(`Call assignments: ${pythonResults.statistics.successful_assignments}`);\nconsole.log(`Substitutions: ${pythonResults.statistics.substitutions}`);\nconsole.log(`Coverage rate: ${pythonResults.statistics.coverage_rate}`);\n\nreturn [{\n  json: {\n    phase: 4,\n    phase_name: 'Python-Powered Call Scheduling Complete',\n    success: true,\n    results: {\n      total_assignments: pythonResults.statistics.successful_assignments,\n      substitutions: pythonResults.statistics.substitutions,\n      gaps: pythonResults.statistics.gaps,\n      coverage_rate: pythonResults.statistics.coverage_rate,\n      gap_violations: pythonResults.statistics.gap_violations,\n      airtable_creations: successfulCreations,\n      python_powered: pythonResults.python_powered\n    },\n    next_phase: 6,\n    ready_for_phase6: successfulCreations > 0,\n    processing_complete: new Date().toISOString()\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1700, 350],
+      "id": "completion-summary",
+      "name": "Completion Summary"
+    }
+  ],
+  "connections": {
+    "Start Phase 4": {
+      "main": [[
+        {"node": "Fetch Faculty with Call History", "type": "main", "index": 0},
+        {"node": "Fetch Faculty Leave", "type": "main", "index": 0}
+      ]]
+    },
+    "Fetch Faculty with Call History": {
+      "main": [[{"node": "Merge All Data", "type": "main", "index": 0}]]
+    },
+    "Fetch Faculty Leave": {
+      "main": [[{"node": "Merge All Data", "type": "main", "index": 1}]]
+    },
+    "Merge All Data": {
+      "main": [[{"node": "Python Call Scheduling Engine", "type": "main", "index": 0}]]
+    },
+    "Python Call Scheduling Engine": {
+      "main": [[{"node": "Format for Airtable", "type": "main", "index": 0}]]
+    },
+    "Format for Airtable": {
+      "main": [[{"node": "Batch Records", "type": "main", "index": 0}]]
+    },
+    "Batch Records": {
+      "main": [[{"node": "Wait", "type": "main", "index": 0}]]
+    },
+    "Wait": {
+      "main": [[{"node": "Create Call Assignments", "type": "main", "index": 0}]]
+    },
+    "Create Call Assignments": {
+      "main": [[{"node": "Completion Summary", "type": "main", "index": 0}]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "description": "Phase 4 v3.0: Python-powered call scheduling with advanced equity algorithms",
+    "version": "3.0.0",
+    "python_features": {
+      "call_scheduling_engine": "Object-oriented Python class for advanced call assignments",
+      "equity_scoring": "Mathematical scoring algorithm for fair call distribution",
+      "gap_penalty_calculation": "Exponential penalty for minimum gap violations",
+      "absence_integration": "Full Phase 0 absence calendar integration",
+      "substitution_logic": "Intelligent substitution when faculty absent",
+      "holiday_weekend_weighting": "Configurable weights for difficult calls"
+    }
+  }
+}

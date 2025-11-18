@@ -1,0 +1,323 @@
+{
+  "name": "Medical Residency Scheduler - Phase 8: Python-Powered Emergency Coverage Engine",
+  "version": "4.0.0",
+  "description": "Phase 8: Python/Pyodide-powered emergency coverage with orchestrator compatibility - Military-focused emergency handling",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [100, 400],
+      "id": "trigger-emergency-coverage",
+      "name": "Start Phase 8: Emergency Coverage"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appDgFtrU7njCKDW5",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl17gcDUtXc14Rjv",
+          "mode": "id"
+        },
+        "filterByFormula": "=NOT(BLANK({Resident (from Residency Block Schedule)}))",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [300, 200],
+      "id": "fetch-master-assignments",
+      "name": "Fetch Master Assignments",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jaswG7byACjIoa6L",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appDgFtrU7njCKDW5",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbloGnXnu0mC6y83L",
+          "mode": "id"
+        },
+        "filterByFormula": "=NOT(BLANK({Faculty}))",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [300, 300],
+      "id": "fetch-faculty-assignments",
+      "name": "Fetch Faculty Assignments",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jaswG7byACjIoa6L",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appDgFtrU7njCKDW5",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl15U9cF0uig9IEo",
+          "mode": "id"
+        },
+        "filterByFormula": "=NOT(BLANK({Faculty}))",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [300, 400],
+      "id": "fetch-call-assignments",
+      "name": "Fetch Call Assignments",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jaswG7byACjIoa6L",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appDgFtrU7njCKDW5",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblmgzodmqTsJ5inf",
+          "mode": "id"
+        },
+        "filterByFormula": "=AND({Faculty} != 'Van Brunt', {Faculty} != 'Napierala', {Faculty Status} != 'Inactive')",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [300, 500],
+      "id": "fetch-active-faculty",
+      "name": "Fetch Active Faculty",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jaswG7byACjIoa6L",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appDgFtrU7njCKDW5",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblJvewumPqMBl6Ut",
+          "mode": "id"
+        },
+        "filterByFormula": "=NOT(BLANK({Faculty}))",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [300, 600],
+      "id": "fetch-faculty-leave",
+      "name": "Fetch Faculty Leave Data",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jaswG7byACjIoa6L",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 5
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [500, 400],
+      "id": "merge-emergency-data",
+      "name": "Merge Emergency Data"
+    },
+    {
+      "parameters": {
+        "pythonCode": "\n# PHASE 8: PYTHON-POWERED EMERGENCY COVERAGE ENGINE\nimport json\nfrom datetime import datetime, timedelta\nfrom typing import Dict, List, Optional, Tuple\n\nprint('=== PHASE 8: EMERGENCY COVERAGE ENGINE ===')\nprint('Python/Pyodide-Powered Military Medical Emergency Coverage\\n')\n\n# Get input data from merge\nall_items = _get_all_items()\nprint(f'Received {len(all_items)} items from merge')\n\n# Separate data by type\nmaster_assignments = []\nfaculty_assignments = []\ncall_assignments = []\nactive_faculty = []\nfaculty_leave = []\n\nfor item in all_items:\n    data = item.json\n    \n    if 'Half-Day of the Week of Blocks' in data and 'Resident (from Residency Block Schedule)' in data:\n        master_assignments.append(data)\n    elif 'Faculty' in data and 'Attending Clinic Templates' in data:\n        faculty_assignments.append(data)\n    elif 'Call Date' in data and 'Faculty' in data:\n        call_assignments.append(data)\n    elif 'Faculty' in data and 'Last Name' in data and 'Leave Start' not in data:\n        active_faculty.append(data)\n    elif 'Leave Start' in data and 'Faculty' in data:\n        faculty_leave.append(data)\n\nprint(f'Master Assignments: {len(master_assignments)}')\nprint(f'Faculty Assignments: {len(faculty_assignments)}')\nprint(f'Call Assignments: {len(call_assignments)}')\nprint(f'Active Faculty: {len(active_faculty)}')\nprint(f'Faculty Leave Records: {len(faculty_leave)}')\n\n# EMERGENCY SCENARIO TYPES (Military-Specific)\nEMERGENCY_SCENARIOS = {\n    'faculty_deployment': {\n        'priority': 'CRITICAL',\n        'response_time_hours': 2,\n        'typical_duration': 'weeks to months',\n        'notification_method': 'deployment_orders'\n    },\n    'faculty_tdy': {\n        'priority': 'HIGH',\n        'response_time_hours': 24,\n        'typical_duration': 'days to weeks',\n        'notification_method': 'tdy_orders'\n    },\n    'resident_medical_emergency': {\n        'priority': 'CRITICAL',\n        'response_time_hours': 4,\n        'typical_duration': 'variable',\n        'notification_method': 'emergency_notification'\n    },\n    'equipment_failure': {\n        'priority': 'MEDIUM',\n        'response_time_hours': 12,\n        'typical_duration': 'hours to days',\n        'notification_method': 'facility_alert'\n    }\n}\n\n# CRITICAL SERVICES (24/7/365 Coverage Required)\nCRITICAL_SERVICES = [\n    'family medicine inpatient',\n    'inpatient team',\n    'overnight call',\n    'emergency',\n    'procedure',\n    'surgery',\n    'trauma'\n]\n\n\nclass EmergencyCoverageEngine:\n    \"\"\"Python-powered emergency coverage engine for military medical residency\"\"\"\n    \n    def __init__(self, master_assignments: List[Dict], faculty_assignments: List[Dict],\n                 call_assignments: List[Dict], active_faculty: List[Dict], \n                 faculty_leave: List[Dict]):\n        self.master_assignments = master_assignments\n        self.faculty_assignments = faculty_assignments\n        self.call_assignments = call_assignments\n        self.active_faculty = {f['id']: f for f in active_faculty}\n        self.faculty_leave = self._process_faculty_leave(faculty_leave)\n        self.audit_trail = []\n        \n    def _process_faculty_leave(self, faculty_leave: List[Dict]) -> Dict[str, Dict]:\n        \"\"\"Process faculty leave records into date-based lookup\"\"\"\n        leave_calendar = {}\n        \n        for leave in faculty_leave:\n            faculty_ids = leave.get('Faculty', [])\n            start = datetime.fromisoformat(leave['Leave Start'].replace('Z', '+00:00'))\n            end = datetime.fromisoformat(leave['Leave End'].replace('Z', '+00:00'))\n            \n            current = start\n            while current <= end:\n                date_str = current.strftime('%Y-%m-%d')\n                \n                for fac_id in faculty_ids:\n                    if fac_id not in leave_calendar:\n                        leave_calendar[fac_id] = {}\n                    \n                    leave_calendar[fac_id][date_str] = {\n                        'leave_type': leave.get('Leave Type', 'Leave'),\n                        'reason': leave.get('Comments', ''),\n                        'approved': leave.get('Leave Approved Residency', False)\n                    }\n                \n                current += timedelta(days=1)\n        \n        return leave_calendar\n    \n    def assess_criticality(self, assignment: Dict) -> str:\n        \"\"\"Assess criticality level of assignment for emergency coverage\"\"\"\n        activity = assignment.get('Activity (from Rotation Templates)', [''])\n        activity_str = ' '.join(activity).lower() if isinstance(activity, list) else str(activity).lower()\n        \n        # Check for critical services\n        for critical_service in CRITICAL_SERVICES:\n            if critical_service in activity_str:\n                return 'CRITICAL'\n        \n        # High priority: Clinics and continuity\n        if any(kw in activity_str for kw in ['clinic', 'continuity', 'specialty']):\n            return 'HIGH'\n        \n        # Medium: Educational activities\n        if any(kw in activity_str for kw in ['conference', 'education', 'didactic', 'grand rounds']):\n            return 'MEDIUM'\n        \n        return 'LOW'\n    \n    def analyze_emergency_impact(self, unavailable_person_id: str, \n                                start_date: str, end_date: str, \n                                reason: str, emergency_type: str) -> Dict:\n        \"\"\"Analyze impact of emergency personnel unavailability\"\"\"\n        print(f'\\n--- ANALYZING EMERGENCY IMPACT ---')\n        print(f'Person ID: {unavailable_person_id}')\n        print(f'Period: {start_date} to {end_date}')\n        print(f'Reason: {reason}')\n        print(f'Type: {emergency_type}')\n        \n        impact = {\n            'affected_assignments': [],\n            'critical_service_gaps': [],\n            'call_schedule_gaps': [],\n            'total_impact_score': 0\n        }\n        \n        # Expand date range\n        dates = self._expand_date_range(start_date, end_date)\n        \n        for date in dates:\n            # Find affected master assignments\n            for assignment in self.master_assignments:\n                residents = assignment.get('Resident (from Residency Block Schedule)', [])\n                if unavailable_person_id in residents:\n                    criticality = self.assess_criticality(assignment)\n                    \n                    impact['affected_assignments'].append({\n                        'assignment_id': assignment.get('id'),\n                        'date': date,\n                        'activity': assignment.get('Activity (from Rotation Templates)', []),\n                        'criticality': criticality,\n                        'requires_immediate_coverage': criticality == 'CRITICAL'\n                    })\n                    \n                    if criticality == 'CRITICAL':\n                        impact['critical_service_gaps'].append({\n                            'service': assignment.get('Activity (from Rotation Templates)', []),\n                            'date': date,\n                            'assignment_id': assignment.get('id')\n                        })\n            \n            # Find affected faculty assignments\n            for assignment in self.faculty_assignments:\n                faculty_ids = assignment.get('Faculty', [])\n                if unavailable_person_id in faculty_ids:\n                    criticality = self.assess_criticality(assignment)\n                    \n                    impact['affected_assignments'].append({\n                        'assignment_id': assignment.get('id'),\n                        'date': date,\n                        'activity': assignment.get('Attending Clinic Templates', []),\n                        'criticality': criticality,\n                        'type': 'faculty_supervision'\n                    })\n            \n            # Find affected call assignments\n            for call in self.call_assignments:\n                call_faculty = call.get('Faculty', [])\n                call_date = call.get('Call Date', '')\n                if unavailable_person_id in call_faculty and call_date == date:\n                    impact['call_schedule_gaps'].append({\n                        'call_id': call.get('id'),\n                        'date': date,\n                        'type': 'Overnight Call',\n                        'criticality': 'CRITICAL'\n                    })\n        \n        # Calculate impact score\n        impact['total_impact_score'] = (\n            len(impact['critical_service_gaps']) * 100 +\n            len(impact['call_schedule_gaps']) * 80 +\n            len(impact['affected_assignments']) * 20\n        )\n        \n        print(f'\\nImpact Analysis:')\n        print(f'  Total assignments affected: {len(impact[\"affected_assignments\"])}')\n        print(f'  Critical service gaps: {len(impact[\"critical_service_gaps\"])}')\n        print(f'  Call schedule gaps: {len(impact[\"call_schedule_gaps\"])}')\n        print(f'  Impact score: {impact[\"total_impact_score\"]}')\n        \n        return impact\n    \n    def find_replacement_options(self, affected_assignments: List[Dict], \n                                unavailable_person_id: str) -> Dict:\n        \"\"\"Find suitable replacement personnel\"\"\"\n        print(f'\\n--- FINDING REPLACEMENT OPTIONS ---')\n        \n        replacement_plan = {\n            'critical_coverage': [],\n            'standard_coverage': [],\n            'escalations': []\n        }\n        \n        for assignment in affected_assignments:\n            date = assignment['date']\n            criticality = assignment['criticality']\n            \n            # Find available faculty for this date\n            available_faculty = []\n            for fac_id, faculty in self.active_faculty.items():\n                if fac_id == unavailable_person_id:\n                    continue\n                \n                # Check if faculty is available (not on leave)\n                if self._is_available(fac_id, date):\n                    confidence = self._calculate_replacement_confidence(faculty, assignment)\n                    available_faculty.append({\n                        'faculty_id': fac_id,\n                        'faculty_name': faculty.get('Faculty', 'Unknown'),\n                        'confidence': confidence,\n                        'qualification': self._assess_qualification(faculty, assignment)\n                    })\n            \n            # Sort by confidence\n            available_faculty.sort(key=lambda x: x['confidence'], reverse=True)\n            \n            if criticality == 'CRITICAL':\n                if available_faculty:\n                    replacement_plan['critical_coverage'].append({\n                        'assignment': assignment,\n                        'recommended_replacement': available_faculty[0],\n                        'all_options': available_faculty[:3]  # Top 3 options\n                    })\n                else:\n                    replacement_plan['escalations'].append({\n                        'assignment': assignment,\n                        'reason': 'No qualified replacements available',\n                        'escalation_level': 'EMERGENCY',\n                        'recommended_action': 'Contact department head immediately'\n                    })\n            else:\n                if available_faculty:\n                    replacement_plan['standard_coverage'].append({\n                        'assignment': assignment,\n                        'recommended_replacement': available_faculty[0],\n                        'all_options': available_faculty[:3]\n                    })\n        \n        print(f'  Critical coverage plans: {len(replacement_plan[\"critical_coverage\"])}')\n        print(f'  Standard coverage plans: {len(replacement_plan[\"standard_coverage\"])}')\n        print(f'  Escalations required: {len(replacement_plan[\"escalations\"])}')\n        \n        return replacement_plan\n    \n    def _is_available(self, faculty_id: str, date: str) -> bool:\n        \"\"\"Check if faculty is available on specific date\"\"\"\n        return faculty_id not in self.faculty_leave or \\\n               date not in self.faculty_leave[faculty_id]\n    \n    def _calculate_replacement_confidence(self, faculty: Dict, assignment: Dict) -> float:\n        \"\"\"Calculate confidence score for replacement (0-100)\"\"\"\n        confidence = 50.0  # Base confidence\n        \n        # Check specialty match\n        if 'Sports Medicine' in faculty.get('Subspecialty', ''):\n            confidence += 20.0\n        \n        # Check procedure qualification\n        if faculty.get('Performs Procedures', False):\n            confidence += 15.0\n        \n        # Check availability pattern\n        available_days = sum(1 for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']\n                           if faculty.get(f'Available {day}', False))\n        confidence += (available_days / 5) * 15.0\n        \n        return min(100.0, confidence)\n    \n    def _assess_qualification(self, faculty: Dict, assignment: Dict) -> str:\n        \"\"\"Assess faculty qualification for assignment\"\"\"\n        activity = str(assignment.get('activity', '')).lower()\n        \n        if 'procedure' in activity and faculty.get('Performs Procedures', False):\n            return 'HIGHLY_QUALIFIED'\n        elif 'sports medicine' in activity and 'Sports Medicine' in faculty.get('Subspecialty', ''):\n            return 'HIGHLY_QUALIFIED'\n        else:\n            return 'QUALIFIED'\n    \n    def _expand_date_range(self, start_date: str, end_date: str) -> List[str]:\n        \"\"\"Expand date range into list of individual dates\"\"\"\n        dates = []\n        start = datetime.fromisoformat(start_date)\n        end = datetime.fromisoformat(end_date)\n        \n        current = start\n        while current <= end:\n            dates.append(current.strftime('%Y-%m-%d'))\n            current += timedelta(days=1)\n        \n        return dates\n    \n    def generate_audit_report(self, emergency_scenario: Dict, impact: Dict, \n                            replacement_plan: Dict) -> Dict:\n        \"\"\"Generate comprehensive audit report\"\"\"\n        return {\n            'emergency_type': emergency_scenario['type'],\n            'impact_summary': f\"{emergency_scenario['unavailable_person_id']} unavailable {emergency_scenario['start_date']} to {emergency_scenario['end_date']}\",\n            'critical_services_affected': [gap['service'] for gap in impact['critical_service_gaps']],\n            'total_assignments_affected': len(impact['affected_assignments']),\n            'critical_gaps': len(impact['critical_service_gaps']),\n            'call_gaps': len(impact['call_schedule_gaps']),\n            'replacement_summary': {\n                'critical_coverage_plans': len(replacement_plan['critical_coverage']),\n                'standard_coverage_plans': len(replacement_plan['standard_coverage']),\n                'escalations_required': len(replacement_plan['escalations'])\n            },\n            'human_review_required': len(replacement_plan['escalations']) > 0,\n            'next_actions': [esc['recommended_action'] for esc in replacement_plan['escalations']]\n        }\n\n\n# EXECUTE EMERGENCY COVERAGE ANALYSIS\nprint('\\n=== INITIALIZING EMERGENCY COVERAGE ENGINE ===')\n\nengine = EmergencyCoverageEngine(\n    master_assignments,\n    faculty_assignments,\n    call_assignments,\n    active_faculty,\n    faculty_leave\n)\n\n# Example emergency scenario: Faculty deployment\n# (In production, this would be passed as input parameters)\nemergency_scenario = {\n    'type': 'faculty_deployment',\n    'unavailable_person_id': active_faculty[0]['id'] if active_faculty else 'unknown',\n    'unavailable_person_name': active_faculty[0].get('Faculty', 'Unknown') if active_faculty else 'Unknown',\n    'start_date': (datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d'),\n    'end_date': (datetime.now() + timedelta(days=97)).strftime('%Y-%m-%d'),  # 90-day deployment\n    'reason': 'Military deployment orders - 90 days',\n    'urgency': 'CRITICAL',\n    'notification_time_hours': 48\n}\n\nprint(f\"\\nEmergency Scenario: {emergency_scenario['type'].upper()}\")\nprint(f\"Person: {emergency_scenario['unavailable_person_name']}\")\nprint(f\"Duration: {emergency_scenario['start_date']} to {emergency_scenario['end_date']}\")\n\n# Step 1: Analyze impact\nimpact_analysis = engine.analyze_emergency_impact(\n    emergency_scenario['unavailable_person_id'],\n    emergency_scenario['start_date'],\n    emergency_scenario['end_date'],\n    emergency_scenario['reason'],\n    emergency_scenario['type']\n)\n\n# Step 2: Find replacements\nreplacement_plan = engine.find_replacement_options(\n    impact_analysis['affected_assignments'],\n    emergency_scenario['unavailable_person_id']\n)\n\n# Step 3: Generate audit report\naudit_report = engine.generate_audit_report(\n    emergency_scenario,\n    impact_analysis,\n    replacement_plan\n)\n\nprint('\\n=== EMERGENCY COVERAGE RESULTS ===')\nprint(f\"Impact Score: {impact_analysis['total_impact_score']}\")\nprint(f\"Critical Services Affected: {len(impact_analysis['critical_service_gaps'])}\")\nprint(f\"Replacement Plans Generated: {len(replacement_plan['critical_coverage']) + len(replacement_plan['standard_coverage'])}\")\nprint(f\"Escalations Required: {len(replacement_plan['escalations'])}\")\nprint(f\"Human Review Required: {audit_report['human_review_required']}\")\n\n# Return results\nreturn [{\n    'json': {\n        'phase': 8,\n        'phase_name': 'Python-Powered Emergency Coverage',\n        'success': True,\n        'python_powered': True,\n        'orchestrator_compatible': True,\n        'emergency_scenario': emergency_scenario,\n        'impact_analysis': impact_analysis,\n        'replacement_plan': replacement_plan,\n        'audit_report': audit_report,\n        'human_review_required': audit_report['human_review_required'],\n        'processing_timestamp': datetime.now().isoformat()\n    }\n}]\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 400],
+      "id": "python-emergency-coverage-engine",
+      "name": "Python Emergency Coverage Engine"
+    }
+  ],
+  "connections": {
+    "Start Phase 8: Emergency Coverage": {
+      "main": [
+        [
+          {
+            "node": "Fetch Master Assignments",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Faculty Assignments",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Call Assignments",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Active Faculty",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Faculty Leave Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Master Assignments": {
+      "main": [
+        [
+          {
+            "node": "Merge Emergency Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Faculty Assignments": {
+      "main": [
+        [
+          {
+            "node": "Merge Emergency Data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Fetch Call Assignments": {
+      "main": [
+        [
+          {
+            "node": "Merge Emergency Data",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Fetch Active Faculty": {
+      "main": [
+        [
+          {
+            "node": "Merge Emergency Data",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Fetch Faculty Leave Data": {
+      "main": [
+        [
+          {
+            "node": "Merge Emergency Data",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "Merge Emergency Data": {
+      "main": [
+        [
+          {
+            "node": "Python Emergency Coverage Engine",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "description": "Phase 8: Python/Pyodide-powered emergency coverage with full orchestrator compatibility",
+    "version": "4.0.0",
+    "author": "Medical Scheduling Team"
+  },
+  "phase8_specifications": {
+    "python_powered": true,
+    "orchestrator_compatibility": "FULL - Uses data-via-Airtable pattern",
+    "purpose": "Handle military-specific emergency coverage scenarios with Python-powered intelligence",
+    "data_sources": [
+      "Master Assignments (Phase 2 output)",
+      "Faculty Assignments (Phase 3 output)",
+      "Call Assignments (Phase 4 output)",
+      "Active Faculty Data",
+      "Faculty Leave Data (Phase 0)"
+    ],
+    "emergency_scenarios": [
+      "Faculty deployment (CRITICAL - 2hr response)",
+      "Faculty TDY (HIGH - 24hr response)",
+      "Resident medical emergency (CRITICAL - 4hr response)",
+      "Equipment failure (MEDIUM - 12hr response)"
+    ],
+    "key_features": [
+      "Python/Pyodide emergency coverage engine",
+      "Military-specific scenario handling",
+      "Critical service protection (24/7/365)",
+      "Intelligent replacement finder",
+      "Confidence scoring algorithm",
+      "Comprehensive audit trail",
+      "Escalation protocols"
+    ],
+    "critical_services_protected": [
+      "Family Medicine Inpatient (24/7/365)",
+      "Overnight Call (24/7/365)",
+      "Emergency Procedures (On-demand)",
+      "Scheduled Clinics (Patient-dependent)"
+    ],
+    "success_criteria": {
+      "impact_analysis_complete": "All affected assignments identified",
+      "replacement_options_generated": "For all critical services",
+      "escalation_protocols_active": "For coverage gaps",
+      "audit_trail_comprehensive": "Human-readable summaries"
+    }
+  }
+}

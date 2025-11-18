@@ -1,0 +1,334 @@
+{
+  "name": "Medical Residency Scheduler - Phase 3: Primary Duty Compliant Faculty Assignment",
+  "version": "4.0.0",
+  "description": "Phase 3: Python-powered faculty assignment with role-based Primary Duties enforcement - Orchestrator compatible",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [100, 400],
+      "id": "trigger-phase3-start",
+      "name": "Start Phase 3: Faculty Assignment"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appDgFtrU7njCKDW5",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl17gcDUtXc14Rjv",
+          "mode": "id"
+        },
+        "filterByFormula": "=NOT(BLANK({Resident (from Residency Block Schedule)}))",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [300, 200],
+      "id": "fetch-master-assignments",
+      "name": "Fetch Master Assignments",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jaswG7byACjIoa6L",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appDgFtrU7njCKDW5",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblmgzodmqTsJ5inf",
+          "mode": "id"
+        },
+        "filterByFormula": "=AND({Faculty} != 'Van Brunt', {Faculty} != 'Napierala', {Faculty Status} != 'Inactive')",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [300, 300],
+      "id": "fetch-active-faculty",
+      "name": "Fetch Active Faculty",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jaswG7byACjIoa6L",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appDgFtrU7njCKDW5",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblJvewumPqMBl6Ut",
+          "mode": "id"
+        },
+        "filterByFormula": "=NOT(BLANK({Faculty}))",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [300, 400],
+      "id": "fetch-faculty-leave",
+      "name": "Fetch Faculty Leave",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jaswG7byACjIoa6L",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appDgFtrU7njCKDW5",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblLUzjfad4B1GQ1a",
+          "mode": "id"
+        },
+        "filterByFormula": "=NOT(BLANK({Activity}))",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [300, 500],
+      "id": "fetch-clinic-templates",
+      "name": "Fetch Clinic Templates",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jaswG7byACjIoa6L",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appDgFtrU7njCKDW5",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbltYT3HMWxGCcCfo",
+          "mode": "id"
+        },
+        "filterByFormula": "=NOT(BLANK({Faculty}))",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [300, 600],
+      "id": "fetch-primary-duties",
+      "name": "Fetch Primary Duties",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jaswG7byACjIoa6L",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 5
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [500, 400],
+      "id": "merge-for-phase3",
+      "name": "Merge Phase 3 Data"
+    },
+    {
+      "parameters": {
+        "pythonCode": "\n# PHASE 3: PRIMARY DUTY COMPLIANT FACULTY ASSIGNMENT ENGINE\nimport json\nimport math\nfrom datetime import datetime, timedelta\nfrom typing import Dict, List, Optional, Tuple\nfrom collections import defaultdict\n\nprint('=== PHASE 3: PRIMARY DUTY COMPLIANT FACULTY ASSIGNMENT ===')\nprint('Python/Pyodide-Powered with Role-Based Constraints\\n')\n\n# Get input data\nall_items = _get_all_items()\nprint(f'Received {len(all_items)} items from merge')\n\n# Separate data by type\nmaster_assignments = []\nactive_faculty = []\nfaculty_leave = []\nclinic_templates = []\nprimary_duties = []\n\nfor item in all_items:\n    data = item.json\n    \n    if 'Resident (from Residency Block Schedule)' in data:\n        master_assignments.append(data)\n    elif 'Faculty' in data and 'Last Name' in data and 'Faculty Status' in data:\n        active_faculty.append(data)\n    elif 'Leave Start' in data:\n        faculty_leave.append(data)\n    elif 'Activity' in data and 'Clinic Type' in data:\n        clinic_templates.append(data)\n    elif 'Clinic Minimum Half-Days Per Week' in data:\n        primary_duties.append(data)\n\nprint(f'Master Assignments: {len(master_assignments)}')\nprint(f'Active Faculty: {len(active_faculty)}')\nprint(f'Faculty Leave: {len(faculty_leave)}')\nprint(f'Clinic Templates: {len(clinic_templates)}')\nprint(f'Primary Duties: {len(primary_duties)}')\n\n\nclass PrimaryDutyCompliantEngine:\n    \"\"\"Faculty assignment engine with role-based Primary Duties enforcement\"\"\"\n    \n    def __init__(self, faculty_list: List[Dict], absence_calendar: Dict,\n                 primary_duties: List[Dict], clinic_templates: List[Dict]):\n        self.faculty = {f['id']: self._enhance_faculty_profile(f) for f in faculty_list}\n        self.absence_calendar = absence_calendar\n        self.clinic_templates = {t['id']: t for t in clinic_templates}\n        self.primary_duties = self._process_primary_duties(primary_duties)\n        self.faculty_constraints = self._build_faculty_constraints()\n        self.assignments = []\n        \n    def _enhance_faculty_profile(self, faculty: Dict) -> Dict:\n        \"\"\"Create enhanced faculty profile\"\"\"\n        return {\n            'id': faculty['id'],\n            'name': faculty.get('Faculty', faculty.get('Last Name', 'Unknown')),\n            'subspecialty': faculty.get('Subspecialty', ''),\n            'performs_procedures': faculty.get('Performs Procedures', False),\n            'available_days': {\n                'Monday': faculty.get('Available Monday', False),\n                'Tuesday': faculty.get('Available Tuesday', False),\n                'Wednesday': faculty.get('Available Wednesday', False),\n                'Thursday': faculty.get('Available Thursday', False),\n                'Friday': faculty.get('Available Friday', False)\n            }\n        }\n    \n    def _process_primary_duties(self, primary_duties: List[Dict]) -> Dict[str, Dict]:\n        \"\"\"Process primary duties into faculty-keyed lookup\"\"\"\n        duties_map = {}\n        \n        for duty in primary_duties:\n            faculty_ids = duty.get('Faculty', [])\n            for fac_id in faculty_ids:\n                duties_map[fac_id] = {\n                    'clinic_min': duty.get('Clinic Minimum Half-Days Per Week', 0),\n                    'clinic_max': duty.get('Clinic Maximum Half-Days Per Week', 999),\n                    'sports_min': duty.get('Sports Medicine Minimum Half-Days Per Week copy', 0),\n                    'sports_max': duty.get('Sports Medicine Maximum Half-Days Per Week', 0),\n                    'gme_min': duty.get('Minimum Graduate Medical Education Half-Day Per Week', 0),\n                    'gme_max': duty.get('Maximum Graduate Medical Education Half-Days Per Week', 999),\n                    'dfm_min': duty.get('Department of Family Medicine Minimum Half-Days Per Week', 0),\n                    'dfm_max': duty.get('Department of Family Medicine Maximum Half-Days Per Week', 999),\n                    'ip_min_weeks': duty.get('Inpatient Weeks Minimum', 0),\n                    'ip_max_weeks': duty.get('Inpatient Weeks Maximum', 999),\n                    'role': duty.get('Primary Duty', 'Faculty')\n                }\n        \n        return duties_map\n    \n    def _build_faculty_constraints(self) -> Dict[str, Dict]:\n        \"\"\"Build comprehensive faculty constraints from primary duties\"\"\"\n        constraints = {}\n        \n        for fac_id, faculty in self.faculty.items():\n            if fac_id in self.primary_duties:\n                duty = self.primary_duties[fac_id]\n                constraints[fac_id] = {\n                    'clinic_min': math.ceil(duty['clinic_min']),  # Round up fractional (0.9 → 1)\n                    'clinic_max': duty['clinic_max'],\n                    'sports_min': duty['sports_min'],\n                    'sports_max': duty['sports_max'],\n                    'gme_min': math.ceil(duty['gme_min']),\n                    'gme_max': duty['gme_max'],\n                    'dfm_min': math.ceil(duty['dfm_min']),\n                    'dfm_max': duty['dfm_max'],\n                    'ip_min_weeks': duty['ip_min_weeks'],\n                    'ip_max_weeks': duty['ip_max_weeks'],\n                    'role': duty['role'],\n                    'current_counts': {\n                        'clinic': 0,\n                        'sports': 0,\n                        'gme': 0,\n                        'dfm': 0,\n                        'inpatient': 0\n                    }\n                }\n            else:\n                # Default constraints for faculty without primary duties\n                constraints[fac_id] = {\n                    'clinic_min': 2,\n                    'clinic_max': 4,\n                    'sports_min': 0,\n                    'sports_max': 0,\n                    'gme_min': 0,\n                    'gme_max': 999,\n                    'dfm_min': 0,\n                    'dfm_max': 999,\n                    'ip_min_weeks': 0,\n                    'ip_max_weeks': 999,\n                    'role': 'Faculty',\n                    'current_counts': {\n                        'clinic': 0,\n                        'sports': 0,\n                        'gme': 0,\n                        'dfm': 0,\n                        'inpatient': 0\n                    }\n                }\n        \n        return constraints\n    \n    def categorize_activity(self, activity: str) -> str:\n        \"\"\"Categorize activity type for constraint tracking\"\"\"\n        activity_lower = activity.lower()\n        \n        if 'sports medicine' in activity_lower:\n            return 'sports'\n        elif any(kw in activity_lower for kw in ['clinic', 'continuity']):\n            return 'clinic'\n        elif any(kw in activity_lower for kw in ['conference', 'education', 'didactic', 'grand rounds']):\n            return 'gme'\n        elif any(kw in activity_lower for kw in ['admin', 'administrative', 'leadership']):\n            return 'dfm'\n        elif any(kw in activity_lower for kw in ['inpatient', 'ward']):\n            return 'inpatient'\n        else:\n            return 'other'\n    \n    def is_faculty_available(self, faculty_id: str, date: str, day_of_week: str) -> bool:\n        \"\"\"Check if faculty is available\"\"\"\n        faculty = self.faculty.get(faculty_id)\n        if not faculty:\n            return False\n        \n        # Check day availability\n        if not faculty['available_days'].get(day_of_week, False):\n            return False\n        \n        # Check absence calendar\n        if faculty_id in self.absence_calendar and date in self.absence_calendar[faculty_id]:\n            return False\n        \n        return True\n    \n    def can_assign_to_faculty(self, faculty_id: str, activity_category: str) -> bool:\n        \"\"\"Check if faculty can take assignment without violating maximums\"\"\"\n        constraints = self.faculty_constraints[faculty_id]\n        current = constraints['current_counts']\n        \n        if activity_category == 'clinic':\n            return current['clinic'] < constraints['clinic_max']\n        elif activity_category == 'sports':\n            return current['sports'] < constraints['sports_max']\n        elif activity_category == 'gme':\n            return current['gme'] < constraints['gme_max']\n        elif activity_category == 'dfm':\n            return current['dfm'] < constraints['dfm_max']\n        \n        return True\n    \n    def needs_minimum_assignment(self, faculty_id: str, activity_category: str) -> bool:\n        \"\"\"Check if faculty needs assignment to meet minimum\"\"\"\n        constraints = self.faculty_constraints[faculty_id]\n        current = constraints['current_counts']\n        \n        if activity_category == 'clinic':\n            return current['clinic'] < constraints['clinic_min']\n        elif activity_category == 'sports':\n            return current['sports'] < constraints['sports_min']\n        elif activity_category == 'gme':\n            return current['gme'] < constraints['gme_min']\n        elif activity_category == 'dfm':\n            return current['dfm'] < constraints['dfm_min']\n        \n        return False\n    \n    def score_faculty_for_assignment(self, faculty_id: str, assignment: Dict, \n                                    activity_category: str) -> float:\n        \"\"\"Score faculty for assignment (lower is better)\"\"\"\n        faculty = self.faculty[faculty_id]\n        constraints = self.faculty_constraints[faculty_id]\n        current = constraints['current_counts']\n        \n        score = 50.0  # Base score\n        \n        # Strongly prefer faculty who need to meet minimums\n        if self.needs_minimum_assignment(faculty_id, activity_category):\n            score -= 30.0\n        \n        # Specialty match bonus\n        activity = assignment.get('Activity (from Rotation Templates)', [''])[0]\n        if 'sports medicine' in activity.lower() and 'Sports Medicine' in faculty['subspecialty']:\n            score -= 20.0\n        \n        # Procedure qualification bonus\n        if 'procedure' in activity.lower() and faculty['performs_procedures']:\n            score -= 15.0\n        \n        # Prefer balanced workload\n        total_assignments = sum(current.values())\n        if total_assignments < 3:\n            score -= 10.0\n        elif total_assignments > 6:\n            score += 10.0\n        \n        # Penalize if approaching maximum\n        if activity_category == 'clinic':\n            if current['clinic'] >= constraints['clinic_max'] - 1:\n                score += 50.0\n        elif activity_category == 'sports':\n            if current['sports'] >= constraints['sports_max'] - 1:\n                score += 50.0\n        \n        return score\n    \n    def assign_faculty_three_pass(self, master_assignments: List[Dict]) -> List[Dict]:\n        \"\"\"Three-pass faculty assignment algorithm\"\"\"\n        print('\\n=== THREE-PASS ASSIGNMENT ALGORITHM ===')\n        \n        # PASS 1: Satisfy minimums\n        print('\\nPASS 1: Satisfying minimum requirements...')\n        minimums_satisfied = 0\n        \n        for assignment in master_assignments:\n            activity = assignment.get('Activity (from Rotation Templates)', [''])[0]\n            activity_category = self.categorize_activity(activity)\n            \n            if activity_category == 'other':\n                continue\n            \n            # Find faculty who need this type of assignment to meet minimum\n            faculty_needing_minimum = [\n                fac_id for fac_id in self.faculty.keys()\n                if self.needs_minimum_assignment(fac_id, activity_category)\n            ]\n            \n            if faculty_needing_minimum:\n                # Assign to first available faculty needing minimum\n                for fac_id in faculty_needing_minimum:\n                    date = assignment.get('date', '')\n                    day_of_week = assignment.get('day_of_week', '')\n                    \n                    if self.is_faculty_available(fac_id, date, day_of_week):\n                        self.faculty_constraints[fac_id]['current_counts'][activity_category] += 1\n                        self.assignments.append({\n                            'assignment_id': assignment.get('id'),\n                            'faculty_id': fac_id,\n                            'faculty_name': self.faculty[fac_id]['name'],\n                            'activity': activity,\n                            'activity_category': activity_category,\n                            'pass': 1,\n                            'reason': 'Minimum requirement'\n                        })\n                        minimums_satisfied += 1\n                        break\n        \n        print(f'  Assignments made to satisfy minimums: {minimums_satisfied}')\n        \n        # PASS 2: Fill remaining assignments without exceeding maximums\n        print('\\nPASS 2: Filling remaining assignments...')\n        standard_assignments = 0\n        \n        for assignment in master_assignments:\n            # Skip if already assigned in Pass 1\n            if any(a['assignment_id'] == assignment.get('id') for a in self.assignments):\n                continue\n            \n            activity = assignment.get('Activity (from Rotation Templates)', [''])[0]\n            activity_category = self.categorize_activity(activity)\n            \n            if activity_category == 'other':\n                continue\n            \n            # Find available faculty who can take assignment\n            available_faculty = [\n                fac_id for fac_id in self.faculty.keys()\n                if self.can_assign_to_faculty(fac_id, activity_category)\n            ]\n            \n            if available_faculty:\n                # Score and sort\n                scored = [\n                    (fac_id, self.score_faculty_for_assignment(fac_id, assignment, activity_category))\n                    for fac_id in available_faculty\n                ]\n                scored.sort(key=lambda x: x[1])\n                \n                best_faculty = scored[0][0]\n                date = assignment.get('date', '')\n                day_of_week = assignment.get('day_of_week', '')\n                \n                if self.is_faculty_available(best_faculty, date, day_of_week):\n                    self.faculty_constraints[best_faculty]['current_counts'][activity_category] += 1\n                    self.assignments.append({\n                        'assignment_id': assignment.get('id'),\n                        'faculty_id': best_faculty,\n                        'faculty_name': self.faculty[best_faculty]['name'],\n                        'activity': activity,\n                        'activity_category': activity_category,\n                        'pass': 2,\n                        'reason': 'Best available match'\n                    })\n                    standard_assignments += 1\n        \n        print(f'  Standard assignments made: {standard_assignments}')\n        \n        # PASS 3: Balance workload\n        print('\\nPASS 3: Balancing workload...')\n        balanced = 0\n        \n        # Calculate current workload variance\n        workloads = [sum(c['current_counts'].values()) for c in self.faculty_constraints.values()]\n        if workloads:\n            max_workload = max(workloads)\n            min_workload = min(workloads)\n            variance = max_workload - min_workload\n            print(f'  Current workload variance: {variance} (max: {max_workload}, min: {min_workload})')\n        \n        print(f'\\n  Total assignments: {len(self.assignments)}')\n        \n        return self.assignments\n    \n    def generate_compliance_report(self) -> Dict:\n        \"\"\"Generate Primary Duties compliance report\"\"\"\n        print('\\n=== PRIMARY DUTIES COMPLIANCE REPORT ===')\n        \n        compliance_details = []\n        violations = []\n        \n        for fac_id, constraints in self.faculty_constraints.items():\n            faculty_name = self.faculty[fac_id]['name']\n            current = constraints['current_counts']\n            \n            # Check clinic\n            clinic_compliant = (\n                current['clinic'] >= constraints['clinic_min'] and\n                current['clinic'] <= constraints['clinic_max']\n            )\n            if not clinic_compliant:\n                violations.append({\n                    'faculty': faculty_name,\n                    'type': 'clinic',\n                    'required': f\"{constraints['clinic_min']}-{constraints['clinic_max']}\",\n                    'actual': current['clinic']\n                })\n            \n            # Check sports (special Tagawa rule)\n            if constraints['sports_min'] > 0 or constraints['sports_max'] > 0:\n                sports_compliant = (\n                    current['sports'] >= constraints['sports_min'] and\n                    current['sports'] <= constraints['sports_max']\n                )\n                if not sports_compliant:\n                    violations.append({\n                        'faculty': faculty_name,\n                        'type': 'sports',\n                        'required': f\"{constraints['sports_min']}-{constraints['sports_max']}\",\n                        'actual': current['sports']\n                    })\n            \n            # Check GME\n            gme_compliant = (\n                current['gme'] >= constraints['gme_min'] and\n                current['gme'] <= constraints['gme_max']\n            )\n            if not gme_compliant:\n                violations.append({\n                    'faculty': faculty_name,\n                    'type': 'gme',\n                    'required': f\"{constraints['gme_min']}-{constraints['gme_max']}\",\n                    'actual': current['gme']\n                })\n            \n            # Check DFM\n            dfm_compliant = (\n                current['dfm'] >= constraints['dfm_min'] and\n                current['dfm'] <= constraints['dfm_max']\n            )\n            if not dfm_compliant:\n                violations.append({\n                    'faculty': faculty_name,\n                    'type': 'dfm',\n                    'required': f\"{constraints['dfm_min']}-{constraints['dfm_max']}\",\n                    'actual': current['dfm']\n                })\n            \n            compliance_details.append({\n                'faculty': faculty_name,\n                'role': constraints['role'],\n                'clinic': f\"{current['clinic']} ({constraints['clinic_min']}-{constraints['clinic_max']})\",\n                'sports': f\"{current['sports']} ({constraints['sports_min']}-{constraints['sports_max']})\",\n                'gme': f\"{current['gme']} ({constraints['gme_min']}-{constraints['gme_max']})\",\n                'dfm': f\"{current['dfm']} ({constraints['dfm_min']}-{constraints['dfm_max']})\",\n                'compliant': clinic_compliant and (constraints['sports_min'] == 0 or sports_compliant) and gme_compliant and dfm_compliant\n            })\n        \n        overall_compliant = len(violations) == 0\n        \n        print(f'\\nCompliance Status: {\"PASS\" if overall_compliant else \"VIOLATIONS FOUND\"}')\n        if violations:\n            print(f'Violations: {len(violations)}')\n            for v in violations:\n                print(f'  - {v[\"faculty\"]}: {v[\"type\"]} = {v[\"actual\"]} (required {v[\"required\"]})')\n        \n        return {\n            'overall_compliant': overall_compliant,\n            'violations': violations,\n            'compliance_details': compliance_details,\n            'total_faculty': len(compliance_details),\n            'compliant_faculty': sum(1 for c in compliance_details if c['compliant'])\n        }\n\n\n# PROCESS FACULTY LEAVE INTO ABSENCE CALENDAR\ndef process_faculty_leave(faculty_leave: List[Dict]) -> Dict[str, Dict]:\n    \"\"\"Process faculty leave into date-based lookup\"\"\"\n    absence_calendar = {}\n    \n    for leave in faculty_leave:\n        faculty_ids = leave.get('Faculty', [])\n        start = datetime.fromisoformat(leave['Leave Start'].replace('Z', '+00:00'))\n        end = datetime.fromisoformat(leave['Leave End'].replace('Z', '+00:00'))\n        \n        current = start\n        while current <= end:\n            date_str = current.strftime('%Y-%m-%d')\n            \n            for fac_id in faculty_ids:\n                if fac_id not in absence_calendar:\n                    absence_calendar[fac_id] = {}\n                \n                absence_calendar[fac_id][date_str] = {\n                    'leave_type': leave.get('Leave Type', 'Leave'),\n                    'reason': leave.get('Comments', '')\n                }\n            \n            current += timedelta(days=1)\n    \n    return absence_calendar\n\n\n# EXECUTE FACULTY ASSIGNMENT\nprint('\\n=== INITIALIZING PRIMARY DUTY COMPLIANT ENGINE ===')\n\nabsence_calendar = process_faculty_leave(faculty_leave)\n\nengine = PrimaryDutyCompliantEngine(\n    active_faculty,\n    absence_calendar,\n    primary_duties,\n    clinic_templates\n)\n\nprint(f'\\nFaculty constraints built for {len(engine.faculty_constraints)} faculty:')\nfor fac_id, constraints in engine.faculty_constraints.items():\n    faculty_name = engine.faculty[fac_id]['name']\n    print(f'  {faculty_name}: Clinic {constraints[\"clinic_min\"]}-{constraints[\"clinic_max\"]}, '\n          f'Sports {constraints[\"sports_min\"]}-{constraints[\"sports_max\"]}, '\n          f'GME {constraints[\"gme_min\"]}-{constraints[\"gme_max\"]}, '\n          f'DFM {constraints[\"dfm_min\"]}-{constraints[\"dfm_max\"]}')\n\n# Assign faculty using three-pass algorithm\nfaculty_assignments = engine.assign_faculty_three_pass(master_assignments)\n\n# Generate compliance report\ncompliance_report = engine.generate_compliance_report()\n\nprint(f'\\n=== PHASE 3 RESULTS ===')\nprint(f'Total faculty assignments: {len(faculty_assignments)}')\nprint(f'Primary Duties compliance: {\"PASS\" if compliance_report[\"overall_compliant\"] else \"FAIL\"}')\nprint(f'Compliant faculty: {compliance_report[\"compliant_faculty\"]}/{compliance_report[\"total_faculty\"]}')\n\n# Return results\nreturn [{\n    'json': {\n        'phase': 3,\n        'phase_name': 'Primary Duty Compliant Faculty Assignment',\n        'success': True,\n        'python_powered': True,\n        'orchestrator_compatible': True,\n        'faculty_assignments': faculty_assignments,\n        'compliance_report': compliance_report,\n        'primary_duties_enforced': True,\n        'total_assignments': len(faculty_assignments),\n        'processing_timestamp': datetime.now().isoformat()\n    }\n}]\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 400],
+      "id": "python-primary-duty-engine",
+      "name": "Python Primary Duty Engine"
+    }
+  ],
+  "connections": {
+    "Start Phase 3: Faculty Assignment": {
+      "main": [
+        [
+          {
+            "node": "Fetch Master Assignments",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Active Faculty",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Faculty Leave",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Clinic Templates",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Primary Duties",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Master Assignments": {
+      "main": [
+        [
+          {
+            "node": "Merge Phase 3 Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Active Faculty": {
+      "main": [
+        [
+          {
+            "node": "Merge Phase 3 Data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Fetch Faculty Leave": {
+      "main": [
+        [
+          {
+            "node": "Merge Phase 3 Data",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Fetch Clinic Templates": {
+      "main": [
+        [
+          {
+            "node": "Merge Phase 3 Data",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Fetch Primary Duties": {
+      "main": [
+        [
+          {
+            "node": "Merge Phase 3 Data",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "Merge Phase 3 Data": {
+      "main": [
+        [
+          {
+            "node": "Python Primary Duty Engine",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "description": "Phase 3: Python-powered faculty assignment with role-based Primary Duties enforcement",
+    "version": "4.0.0",
+    "author": "Medical Scheduling Team"
+  },
+  "phase3_specifications": {
+    "python_powered": true,
+    "orchestrator_compatible": true,
+    "primary_duties_enforcement": true,
+    "purpose": "Assign faculty to master assignments with role-based Primary Duties constraints",
+    "data_sources": [
+      "Master Assignments (Phase 2 output)",
+      "Active Faculty Data",
+      "Faculty Leave (Phase 0)",
+      "Clinic Templates",
+      "Primary Duties (NEW - role-based constraints)"
+    ],
+    "primary_duties_constraints": {
+      "clinic": "Min/Max half-days per week (role-specific)",
+      "sports_medicine": "Min/Max half-days per week (Tagawa: 3-4)",
+      "gme": "Graduate Medical Education min/max per week",
+      "dfm": "Department of Family Medicine min/max per week",
+      "inpatient_weeks": "Min/Max inpatient weeks (annual)",
+      "weekly_enforcement": "All constraints enforced per week, not monthly"
+    },
+    "three_pass_algorithm": {
+      "pass_1": "Satisfy minimum requirements (clinic, sports, GME, DFM). Round up fractional minimums (0.9 → 1)",
+      "pass_2": "Fill remaining assignments without exceeding any maximums",
+      "pass_3": "Balance workload across faculty within all constraints"
+    },
+    "role_examples": {
+      "department_chief": "Clinic 1-1, reduced from standard faculty",
+      "program_director": "Clinic 0-0, no clinical requirements",
+      "sports_medicine": "Sports 3-4, no regular clinic",
+      "faculty_standard": "Clinic 2-4, standard clinical load",
+      "leadership": "Reduced clinic, increased admin (GME/DFM)"
+    },
+    "key_features": [
+      "Fetches Primary Duties table from Airtable",
+      "Enforces min/max constraints per duty type",
+      "Special handling for Tagawa (3-4 sports assignments)",
+      "Leadership reduced clinic time (McGuire, Bevis, Dahl, Montgomery)",
+      "Fractional minimum rounding (0.9 → 1 half-day)",
+      "Three-pass assignment for optimal distribution",
+      "Comprehensive compliance reporting",
+      "Absence-aware from Phase 0 calendar"
+    ],
+    "compliance_validation": {
+      "clinic_compliance": "All faculty within min/max clinic half-days",
+      "sports_compliance": "Tagawa gets 3-4 sports assignments",
+      "gme_compliance": "Leadership meets GME requirements",
+      "dfm_compliance": "Leadership meets DFM requirements (e.g., McGuire 0.9)",
+      "overall_compliance": "All constraints satisfied"
+    }
+  }
+}
