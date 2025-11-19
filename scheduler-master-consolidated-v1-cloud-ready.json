@@ -2764,13 +2764,11 @@
       ]
     }
   },
-  "active": false,
   "settings": {
     "executionOrder": "v1"
   },
-  "staticData": null,
+  "staticData": {},
   "meta": {
-    "templateCredsSetupCompleted": true,
     "description": "Consolidated workflow containing all scheduler phases - Orchestrator, Phase 0-4, 6-9",
     "version": "1.0.0",
     "consolidation_info": {
@@ -2793,5 +2791,7 @@
       "node_id_strategy": "Namespaced with phase prefixes",
       "created_by": "N8N Workflow Consolidation Script v1.0"
     }
-  }
+  },
+  "version": 1,
+  "description": "Consolidated workflow containing all scheduler phases - Orchestrator, Phase 0-4, 6-9"
 }
