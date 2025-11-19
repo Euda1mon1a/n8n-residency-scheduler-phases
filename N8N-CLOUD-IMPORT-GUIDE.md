@@ -2,7 +2,9 @@
 
 ## ✅ Ready for Import
 
-**File to upload:** `scheduler-master-consolidated-v1-cloud-ready.json`
+**File to upload:** `scheduler-master-consolidated-v1-cloud-ready-fixed.json` ⭐ **USE THIS ONE**
+
+~~`scheduler-master-consolidated-v1-cloud-ready.json`~~ (deprecated - missing mode parameters)
 
 ## What Was Fixed
 
@@ -38,6 +40,20 @@ The consolidated workflow had fields that don't appear in standard n8n exports:
 }
 ```
 
+### Issue 3: Missing `mode` Parameter on Code Nodes ❌ **ROOT CAUSE**
+All 28 Code nodes were missing the required `mode` parameter, causing the `toLowerCase` error during import.
+
+**Fix:** Added `"mode": "runOnceForEachItem"` to all Code node parameters:
+```json
+{
+  "type": "n8n-nodes-base.code",
+  "parameters": {
+    "jsCode": "...",
+    "mode": "runOnceForEachItem"  // ← ADDED THIS
+  }
+}
+```
+
 ## Import Steps
 
 1. **Open n8n Cloud**
@@ -46,7 +62,7 @@ The consolidated workflow had fields that don't appear in standard n8n exports:
 
 2. **Import Workflow**
    - Click "⋮" menu → "Import from File"
-   - Select: `scheduler-master-consolidated-v1-cloud-ready.json`
+   - Select: `scheduler-master-consolidated-v1-cloud-ready-fixed.json`
    - Click "Import"
 
 3. **Configure Credentials** (After Import)
@@ -109,11 +125,12 @@ PHASE 8 (16000px) → PHASE 9 (18000px)
 
 ## File Versions
 
-| File | Purpose |
-|------|---------|
-| `scheduler-master-consolidated-v1.json` | Original with local credentials |
-| `scheduler-master-consolidated-v1-cloud-ready.json` | **Use this for n8n cloud** ✅ |
-| `test-minimal.json` | Minimal test workflow |
+| File | Purpose | Status |
+|------|---------|--------|
+| `scheduler-master-consolidated-v1.json` | Original with local credentials | ❌ Don't use |
+| `scheduler-master-consolidated-v1-cloud-ready.json` | No credentials, missing mode params | ❌ Deprecated |
+| `scheduler-master-consolidated-v1-cloud-ready-fixed.json` | **Complete fix with mode parameters** | ✅ **USE THIS** |
+| `test-minimal.json` | Minimal test workflow (2 nodes) | ✅ For testing |
 
 ## Next Steps After Successful Import
 
