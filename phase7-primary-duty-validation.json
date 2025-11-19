@@ -7,7 +7,10 @@
       "parameters": {},
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [100, 400],
+      "position": [
+        100,
+        400
+      ],
       "id": "trigger-phase7-start",
       "name": "Start Phase 7: Final Validation"
     },
@@ -29,7 +32,10 @@
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [300, 150],
+      "position": [
+        300,
+        150
+      ],
       "id": "fetch-final-master-assignments",
       "name": "Fetch Final Master Assignments",
       "credentials": {
@@ -57,7 +63,10 @@
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [300, 250],
+      "position": [
+        300,
+        250
+      ],
       "id": "fetch-final-faculty-assignments",
       "name": "Fetch Final Faculty Assignments",
       "credentials": {
@@ -85,7 +94,10 @@
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [300, 350],
+      "position": [
+        300,
+        350
+      ],
       "id": "fetch-final-call-assignments",
       "name": "Fetch Final Call Assignments",
       "credentials": {
@@ -113,7 +125,10 @@
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [300, 450],
+      "position": [
+        300,
+        450
+      ],
       "id": "fetch-active-faculty-data",
       "name": "Fetch Active Faculty Data",
       "credentials": {
@@ -141,7 +156,10 @@
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [300, 550],
+      "position": [
+        300,
+        550
+      ],
       "id": "fetch-resident-data",
       "name": "Fetch Resident Data",
       "credentials": {
@@ -169,7 +187,10 @@
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [300, 650],
+      "position": [
+        300,
+        650
+      ],
       "id": "fetch-primary-duties",
       "name": "Fetch Primary Duties",
       "credentials": {
@@ -185,7 +206,10 @@
       },
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
-      "position": [500, 400],
+      "position": [
+        500,
+        400
+      ],
       "id": "merge-for-phase7",
       "name": "Merge Data for Phase 7"
     },
@@ -195,7 +219,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [700, 400],
+      "position": [
+        700,
+        400
+      ],
       "id": "phase7-validation-engine",
       "name": "Phase 7: Primary Duty & ACGME Validation"
     }
@@ -327,7 +354,14 @@
   },
   "phase7_specifications": {
     "orchestrator_compatible": true,
-    "primary_duties_validation": true,
+    "primary_duties_validation": {
+      "clinic_compliance": "Validates min/max clinic half-days per role",
+      "sports_compliance": "Validates Tagawa 3-4 sports assignments",
+      "gme_compliance": "Validates Graduate Medical Education requirements",
+      "dfm_compliance": "Validates Department of Family Medicine requirements (leadership)",
+      "violation_detection": "Flags under/over-assignment by type",
+      "fractional_rounding": "Rounds up minimums (0.9 → 1) for validation"
+    },
     "acgme_validation": true,
     "purpose": "Validate role-based Primary Duties compliance and ACGME requirements for deployment",
     "data_sources": [
@@ -338,14 +372,6 @@
       "Resident Data",
       "Primary Duties (NEW - role-based constraints)"
     ],
-    "primary_duties_validation": {
-      "clinic_compliance": "Validates min/max clinic half-days per role",
-      "sports_compliance": "Validates Tagawa 3-4 sports assignments",
-      "gme_compliance": "Validates Graduate Medical Education requirements",
-      "dfm_compliance": "Validates Department of Family Medicine requirements (leadership)",
-      "violation_detection": "Flags under/over-assignment by type",
-      "fractional_rounding": "Rounds up minimums (0.9 → 1) for validation"
-    },
     "role_specific_checks": {
       "department_chief": "Validates reduced clinic (1-1), DFM requirements",
       "program_director": "Validates no clinic requirement (0-0)",

@@ -7,7 +7,10 @@
       "parameters": {},
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [100, 400],
+      "position": [
+        100,
+        400
+      ],
       "id": "trigger-phase6-start",
       "name": "Start Phase 6: Minimal Cleanup"
     },
@@ -29,7 +32,10 @@
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [300, 300],
+      "position": [
+        300,
+        300
+      ],
       "id": "fetch-final-master-assignments",
       "name": "Fetch Final Master Assignments",
       "credentials": {
@@ -57,7 +63,10 @@
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [300, 400],
+      "position": [
+        300,
+        400
+      ],
       "id": "fetch-final-faculty-assignments",
       "name": "Fetch Final Faculty Assignments",
       "credentials": {
@@ -73,7 +82,10 @@
       },
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
-      "position": [500, 350],
+      "position": [
+        500,
+        350
+      ],
       "id": "merge-for-phase6",
       "name": "Merge Data for Phase 6"
     },
@@ -83,7 +95,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [700, 350],
+      "position": [
+        700,
+        350
+      ],
       "id": "phase6-minimal-cleanup-engine",
       "name": "Phase 6: Minimal Cleanup Engine"
     }

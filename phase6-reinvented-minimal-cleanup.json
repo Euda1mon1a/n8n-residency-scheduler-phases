@@ -7,7 +7,10 @@
       "parameters": {},
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [100, 400],
+      "position": [
+        100,
+        400
+      ],
       "id": "trigger-phase6-reinvented-start",
       "name": "Start Phase 6: Reinvented Minimal Cleanup"
     },
@@ -17,7 +20,10 @@
       },
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
-      "position": [500, 400],
+      "position": [
+        500,
+        400
+      ],
       "id": "merge-for-phase6-reinvented",
       "name": "Merge Data for Reinvented Phase 6"
     },
@@ -39,7 +45,10 @@
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [300, 200],
+      "position": [
+        300,
+        200
+      ],
       "id": "fetch-final-master-assignments",
       "name": "Fetch Final Master Assignments",
       "credentials": {
@@ -67,9 +76,12 @@
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [300, 300],
+      "position": [
+        300,
+        300
+      ],
       "id": "fetch-final-faculty-assignments",
-      "name": "Fetch Final Faculty Assignments", 
+      "name": "Fetch Final Faculty Assignments",
       "credentials": {
         "airtableTokenApi": {
           "id": "jaswG7byACjIoa6L",
@@ -83,7 +95,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [700, 400],
+      "position": [
+        700,
+        400
+      ],
       "id": "phase6-reinvented-minimal-cleanup-engine",
       "name": "Phase 6: Reinvented Minimal Cleanup Engine"
     },
@@ -93,7 +108,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [900, 400],
+      "position": [
+        900,
+        400
+      ],
       "id": "phase6-revolutionary-cleanup-execution",
       "name": "Phase 6: Revolutionary Cleanup Execution"
     },
@@ -103,7 +121,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1100, 400],
+      "position": [
+        1100,
+        400
+      ],
       "id": "phase6-reinvented-final-summary",
       "name": "Phase 6: Reinvented Final Summary"
     }
@@ -118,7 +139,7 @@
             "index": 0
           },
           {
-            "node": "Fetch Final Faculty Assignments", 
+            "node": "Fetch Final Faculty Assignments",
             "type": "main",
             "index": 0
           }
@@ -141,7 +162,7 @@
         [
           {
             "node": "Merge Data for Reinvented Phase 6",
-            "type": "main", 
+            "type": "main",
             "index": 1
           }
         ]
@@ -228,7 +249,7 @@
     },
     "validation_gates": [
       "Revolutionary workflow operational validation",
-      "Upstream phase integration health check", 
+      "Upstream phase integration health check",
       "ACGME compliance maintenance verification",
       "Business impact realization confirmation",
       "Phase 7 readiness assessment"

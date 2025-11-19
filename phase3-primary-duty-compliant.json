@@ -7,7 +7,10 @@
       "parameters": {},
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [100, 400],
+      "position": [
+        100,
+        400
+      ],
       "id": "trigger-phase3-start",
       "name": "Start Phase 3: Faculty Assignment"
     },
@@ -29,7 +32,10 @@
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [300, 200],
+      "position": [
+        300,
+        200
+      ],
       "id": "fetch-master-assignments",
       "name": "Fetch Master Assignments",
       "credentials": {
@@ -57,7 +63,10 @@
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [300, 300],
+      "position": [
+        300,
+        300
+      ],
       "id": "fetch-active-faculty",
       "name": "Fetch Active Faculty",
       "credentials": {
@@ -85,7 +94,10 @@
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [300, 400],
+      "position": [
+        300,
+        400
+      ],
       "id": "fetch-faculty-leave",
       "name": "Fetch Faculty Leave",
       "credentials": {
@@ -113,7 +125,10 @@
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [300, 500],
+      "position": [
+        300,
+        500
+      ],
       "id": "fetch-clinic-templates",
       "name": "Fetch Clinic Templates",
       "credentials": {
@@ -141,7 +156,10 @@
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [300, 600],
+      "position": [
+        300,
+        600
+      ],
       "id": "fetch-primary-duties",
       "name": "Fetch Primary Duties",
       "credentials": {
@@ -157,7 +175,10 @@
       },
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
-      "position": [500, 400],
+      "position": [
+        500,
+        400
+      ],
       "id": "merge-for-phase3",
       "name": "Merge Phase 3 Data"
     },
@@ -167,7 +188,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [700, 400],
+      "position": [
+        700,
+        400
+      ],
       "id": "python-primary-duty-engine",
       "name": "Python Primary Duty Engine"
     }

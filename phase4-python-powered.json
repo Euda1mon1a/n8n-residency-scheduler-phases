@@ -7,7 +7,10 @@
       "parameters": {},
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [100, 400],
+      "position": [
+        100,
+        400
+      ],
       "id": "trigger-phase4",
       "name": "Start Phase 4"
     },
@@ -29,7 +32,10 @@
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [300, 300],
+      "position": [
+        300,
+        300
+      ],
       "id": "fetch-faculty",
       "name": "Fetch Faculty with Call History",
       "credentials": {
@@ -57,7 +63,10 @@
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [300, 400],
+      "position": [
+        300,
+        400
+      ],
       "id": "fetch-faculty-leave",
       "name": "Fetch Faculty Leave",
       "credentials": {
@@ -73,7 +82,10 @@
       },
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
-      "position": [500, 350],
+      "position": [
+        500,
+        350
+      ],
       "id": "merge-all-data",
       "name": "Merge All Data"
     },
@@ -83,7 +95,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [700, 350],
+      "position": [
+        700,
+        350
+      ],
       "id": "python-call-scheduling-engine",
       "name": "Python Call Scheduling Engine",
       "notes": "Advanced call scheduling with Python"
@@ -94,7 +109,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [900, 350],
+      "position": [
+        900,
+        350
+      ],
       "id": "format-for-airtable",
       "name": "Format for Airtable"
     },
@@ -105,7 +123,10 @@
       },
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
-      "position": [1100, 350],
+      "position": [
+        1100,
+        350
+      ],
       "id": "batch-records",
       "name": "Batch Records"
     },
@@ -115,7 +136,10 @@
       },
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
-      "position": [1300, 350],
+      "position": [
+        1300,
+        350
+      ],
       "id": "wait-rate-limit",
       "name": "Wait",
       "webhookId": "phase4-python-wait"
@@ -133,7 +157,10 @@
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1500, 350],
+      "position": [
+        1500,
+        350
+      ],
       "id": "create-call-assignments",
       "name": "Create Call Assignments",
       "credentials": {
@@ -149,41 +176,118 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1700, 350],
+      "position": [
+        1700,
+        350
+      ],
       "id": "completion-summary",
       "name": "Completion Summary"
     }
   ],
   "connections": {
     "Start Phase 4": {
-      "main": [[
-        {"node": "Fetch Faculty with Call History", "type": "main", "index": 0},
-        {"node": "Fetch Faculty Leave", "type": "main", "index": 0}
-      ]]
+      "main": [
+        [
+          {
+            "node": "Fetch Faculty with Call History",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Faculty Leave",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Fetch Faculty with Call History": {
-      "main": [[{"node": "Merge All Data", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "Merge All Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Fetch Faculty Leave": {
-      "main": [[{"node": "Merge All Data", "type": "main", "index": 1}]]
+      "main": [
+        [
+          {
+            "node": "Merge All Data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
     },
     "Merge All Data": {
-      "main": [[{"node": "Python Call Scheduling Engine", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "Python Call Scheduling Engine",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Python Call Scheduling Engine": {
-      "main": [[{"node": "Format for Airtable", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "Format for Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Format for Airtable": {
-      "main": [[{"node": "Batch Records", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "Batch Records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Batch Records": {
-      "main": [[{"node": "Wait", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Wait": {
-      "main": [[{"node": "Create Call Assignments", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "Create Call Assignments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Create Call Assignments": {
-      "main": [[{"node": "Completion Summary", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "Completion Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {

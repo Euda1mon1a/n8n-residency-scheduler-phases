@@ -7,7 +7,10 @@
       "parameters": {},
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [100, 400],
+      "position": [
+        100,
+        400
+      ],
       "id": "trigger-phase9-excel-export",
       "name": "Start Phase 9: Excel Export Engine"
     },
@@ -17,7 +20,10 @@
       },
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
-      "position": [500, 400],
+      "position": [
+        500,
+        400
+      ],
       "id": "merge-all-phase-results",
       "name": "Merge All Revolutionary Phase Results"
     },
@@ -27,7 +33,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [700, 400],
+      "position": [
+        700,
+        400
+      ],
       "id": "phase9-excel-format-engine",
       "name": "Phase 9: Excel Format Engine"
     },
@@ -37,7 +46,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [900, 400],
+      "position": [
+        900,
+        400
+      ],
       "id": "excel-file-generator",
       "name": "Excel File Generator"
     },
@@ -52,7 +64,10 @@
       },
       "type": "n8n-nodes-base.spreadsheetFile",
       "typeVersion": 2,
-      "position": [1100, 400],
+      "position": [
+        1100,
+        400
+      ],
       "id": "generate-excel-file",
       "name": "Generate Excel File"
     },
@@ -62,7 +77,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1300, 400],
+      "position": [
+        1300,
+        400
+      ],
       "id": "phase9-completion-summary",
       "name": "Phase 9 Completion Summary"
     }
@@ -148,7 +166,7 @@
     "revolutionary_features_preserved": {
       "phase0_absence_loading": "Early absence processing prevents orphaned assignments",
       "phase1_smart_pairing": "Intelligent pairing with absence awareness",
-      "phase2_resident_association": "Optimized resident-assignment matching", 
+      "phase2_resident_association": "Optimized resident-assignment matching",
       "phase3_faculty_assignment": "ACGME-compliant supervision automation",
       "phase4_call_scheduling": "Intelligent call distribution with equity",
       "phase5_elimination": "Complete removal of post-hoc override processing",

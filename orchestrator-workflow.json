@@ -7,7 +7,10 @@
       "parameters": {},
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [100, 500],
+      "position": [
+        100,
+        500
+      ],
       "id": "orchestrator-trigger",
       "name": "Start Master Orchestrator"
     },
@@ -17,7 +20,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [300, 500],
+      "position": [
+        300,
+        500
+      ],
       "id": "initialize-orchestrator",
       "name": "Initialize Orchestrator"
     },
@@ -28,7 +34,10 @@
       },
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.1,
-      "position": [500, 300],
+      "position": [
+        500,
+        300
+      ],
       "id": "execute-phase0",
       "name": "Execute Phase 0: Absence Loading",
       "notes": "Loads all approved absences upfront"
@@ -40,7 +49,10 @@
       },
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.1,
-      "position": [700, 300],
+      "position": [
+        700,
+        300
+      ],
       "id": "execute-phase1",
       "name": "Execute Phase 1: Block Pairing",
       "notes": "Creates faculty-block pairings with absence checking"
@@ -52,7 +64,10 @@
       },
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.1,
-      "position": [900, 300],
+      "position": [
+        900,
+        300
+      ],
       "id": "execute-phase2",
       "name": "Execute Phase 2: Resident Association",
       "notes": "Associates residents with blocks, checking availability"
@@ -64,7 +79,10 @@
       },
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.1,
-      "position": [1100, 300],
+      "position": [
+        1100,
+        300
+      ],
       "id": "execute-phase3",
       "name": "Execute Phase 3: Faculty Assignment",
       "notes": "Generates absence-aware faculty assignments"
@@ -76,7 +94,10 @@
       },
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.1,
-      "position": [1300, 300],
+      "position": [
+        1300,
+        300
+      ],
       "id": "execute-phase4",
       "name": "Execute Phase 4: Call Scheduling",
       "notes": "Enhanced call scheduling with workload balancing"
@@ -87,7 +108,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1500, 300],
+      "position": [
+        1500,
+        300
+      ],
       "id": "skip-phase5",
       "name": "Skip Phase 5 (Obsolete)"
     },
@@ -98,7 +122,10 @@
       },
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.1,
-      "position": [1700, 300],
+      "position": [
+        1700,
+        300
+      ],
       "id": "execute-phase6",
       "name": "Execute Phase 6: Minimal Cleanup",
       "notes": "86% faster cleanup due to early absence integration"
@@ -110,7 +137,10 @@
       },
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.1,
-      "position": [1900, 300],
+      "position": [
+        1900,
+        300
+      ],
       "id": "execute-phase7",
       "name": "Execute Phase 7: Validation & Reporting",
       "notes": "Final validation and comprehensive reporting"
@@ -122,7 +152,10 @@
       },
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.1,
-      "position": [2100, 300],
+      "position": [
+        2100,
+        300
+      ],
       "id": "execute-phase8",
       "name": "Execute Phase 8: Emergency Coverage",
       "notes": "Emergency coverage and gap filling"
@@ -134,7 +167,10 @@
       },
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.1,
-      "position": [2300, 300],
+      "position": [
+        2300,
+        300
+      ],
       "id": "execute-phase9",
       "name": "Execute Phase 9: Excel Export",
       "notes": "Final Excel export for schedule distribution"
@@ -145,7 +181,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2500, 300],
+      "position": [
+        2500,
+        300
+      ],
       "id": "finalize-orchestrator",
       "name": "Finalize & Generate Report"
     },
@@ -163,7 +202,10 @@
       },
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
-      "position": [2700, 300],
+      "position": [
+        2700,
+        300
+      ],
       "id": "check-success",
       "name": "Check Execution Success"
     },
@@ -173,7 +215,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2900, 200],
+      "position": [
+        2900,
+        200
+      ],
       "id": "success-handler",
       "name": "Success - Log & Report"
     },
@@ -183,7 +228,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2900, 400],
+      "position": [
+        2900,
+        400
+      ],
       "id": "error-handler",
       "name": "Error - Log & Alert"
     }

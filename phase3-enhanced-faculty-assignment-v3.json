@@ -7,7 +7,10 @@
       "parameters": {},
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [100, 400],
+      "position": [
+        100,
+        400
+      ],
       "id": "trigger-phase3",
       "name": "Start Phase 3"
     },
@@ -17,7 +20,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [300, 400],
+      "position": [
+        300,
+        400
+      ],
       "id": "detect-execution-mode",
       "name": "Detect Execution Mode"
     },
@@ -35,7 +41,10 @@
       },
       "type": "n8n-nodes-base.if",
       "typeVersion": 1,
-      "position": [500, 400],
+      "position": [
+        500,
+        400
+      ],
       "id": "check-mode",
       "name": "Check Mode"
     },
@@ -57,7 +66,10 @@
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [700, 300],
+      "position": [
+        700,
+        300
+      ],
       "id": "fetch-phase2-output-orch",
       "name": "Fetch Phase 2 Output (Orchestrator)",
       "credentials": {
@@ -85,7 +97,10 @@
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [700, 200],
+      "position": [
+        700,
+        200
+      ],
       "id": "fetch-faculty-orch",
       "name": "Fetch Faculty (Orchestrator)",
       "credentials": {
@@ -113,7 +128,10 @@
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [700, 400],
+      "position": [
+        700,
+        400
+      ],
       "id": "fetch-clinic-templates-orch",
       "name": "Fetch Clinic Templates (Orchestrator)",
       "credentials": {
@@ -129,7 +147,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [700, 100],
+      "position": [
+        700,
+        100
+      ],
       "id": "load-phase0-data-orch",
       "name": "Load Phase 0 Data (Orchestrator)"
     },
@@ -139,7 +160,10 @@
       },
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
-      "position": [900, 250],
+      "position": [
+        900,
+        250
+      ],
       "id": "merge-orchestrator-data",
       "name": "Merge Orchestrator Data"
     },
@@ -161,7 +185,10 @@
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [700, 500],
+      "position": [
+        700,
+        500
+      ],
       "id": "fetch-master-assignments-standalone",
       "name": "Fetch Master Assignments (Standalone)",
       "credentials": {
@@ -189,7 +216,10 @@
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [700, 600],
+      "position": [
+        700,
+        600
+      ],
       "id": "fetch-faculty-standalone",
       "name": "Fetch Faculty (Standalone)",
       "credentials": {
@@ -217,7 +247,10 @@
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [700, 700],
+      "position": [
+        700,
+        700
+      ],
       "id": "fetch-clinic-templates-standalone",
       "name": "Fetch Clinic Templates (Standalone)",
       "credentials": {
@@ -233,7 +266,10 @@
       },
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
-      "position": [900, 600],
+      "position": [
+        900,
+        600
+      ],
       "id": "merge-standalone-data",
       "name": "Merge Standalone Data"
     },
@@ -243,7 +279,10 @@
       },
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
-      "position": [1100, 400],
+      "position": [
+        1100,
+        400
+      ],
       "id": "merge-both-modes",
       "name": "Merge Both Modes"
     },
@@ -254,7 +293,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1300, 400],
+      "position": [
+        1300,
+        400
+      ],
       "id": "pyodide-faculty-assignment",
       "name": "Pyodide Faculty Assignment Engine"
     },
@@ -264,7 +306,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1500, 400],
+      "position": [
+        1500,
+        400
+      ],
       "id": "format-for-airtable",
       "name": "Format for Airtable"
     },
@@ -275,7 +320,10 @@
       },
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
-      "position": [1700, 400],
+      "position": [
+        1700,
+        400
+      ],
       "id": "batch-records",
       "name": "Batch Records"
     },
@@ -285,7 +333,10 @@
       },
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
-      "position": [1900, 400],
+      "position": [
+        1900,
+        400
+      ],
       "id": "wait-rate-limit",
       "name": "Wait (Rate Limiting)",
       "webhookId": "phase3-v3-wait"
@@ -303,7 +354,10 @@
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [2100, 400],
+      "position": [
+        2100,
+        400
+      ],
       "id": "create-faculty-assignments",
       "name": "Create Faculty Assignments",
       "credentials": {
@@ -319,77 +373,244 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2300, 400],
+      "position": [
+        2300,
+        400
+      ],
       "id": "completion-summary",
       "name": "Phase 3 Completion Summary"
     }
   ],
   "connections": {
     "Start Phase 3": {
-      "main": [[{"node": "Detect Execution Mode", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "Detect Execution Mode",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Detect Execution Mode": {
-      "main": [[{"node": "Check Mode", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "Check Mode",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Check Mode": {
       "main": [
         [
-          {"node": "Load Phase 0 Data (Orchestrator)", "type": "main", "index": 0},
-          {"node": "Fetch Faculty (Orchestrator)", "type": "main", "index": 0},
-          {"node": "Fetch Phase 2 Output (Orchestrator)", "type": "main", "index": 0},
-          {"node": "Fetch Clinic Templates (Orchestrator)", "type": "main", "index": 0}
+          {
+            "node": "Load Phase 0 Data (Orchestrator)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Faculty (Orchestrator)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Phase 2 Output (Orchestrator)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Clinic Templates (Orchestrator)",
+            "type": "main",
+            "index": 0
+          }
         ],
         [
-          {"node": "Fetch Master Assignments (Standalone)", "type": "main", "index": 0},
-          {"node": "Fetch Faculty (Standalone)", "type": "main", "index": 0},
-          {"node": "Fetch Clinic Templates (Standalone)", "type": "main", "index": 0}
+          {
+            "node": "Fetch Master Assignments (Standalone)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Faculty (Standalone)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Clinic Templates (Standalone)",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
     "Load Phase 0 Data (Orchestrator)": {
-      "main": [[{"node": "Merge Orchestrator Data", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "Merge Orchestrator Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Fetch Faculty (Orchestrator)": {
-      "main": [[{"node": "Merge Orchestrator Data", "type": "main", "index": 1}]]
+      "main": [
+        [
+          {
+            "node": "Merge Orchestrator Data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
     },
     "Fetch Phase 2 Output (Orchestrator)": {
-      "main": [[{"node": "Merge Orchestrator Data", "type": "main", "index": 2}]]
+      "main": [
+        [
+          {
+            "node": "Merge Orchestrator Data",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
     },
     "Fetch Clinic Templates (Orchestrator)": {
-      "main": [[{"node": "Merge Orchestrator Data", "type": "main", "index": 3}]]
+      "main": [
+        [
+          {
+            "node": "Merge Orchestrator Data",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
     },
     "Merge Orchestrator Data": {
-      "main": [[{"node": "Merge Both Modes", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "Merge Both Modes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Fetch Master Assignments (Standalone)": {
-      "main": [[{"node": "Merge Standalone Data", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "Merge Standalone Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Fetch Faculty (Standalone)": {
-      "main": [[{"node": "Merge Standalone Data", "type": "main", "index": 1}]]
+      "main": [
+        [
+          {
+            "node": "Merge Standalone Data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
     },
     "Fetch Clinic Templates (Standalone)": {
-      "main": [[{"node": "Merge Standalone Data", "type": "main", "index": 2}]]
+      "main": [
+        [
+          {
+            "node": "Merge Standalone Data",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
     },
     "Merge Standalone Data": {
-      "main": [[{"node": "Merge Both Modes", "type": "main", "index": 1}]]
+      "main": [
+        [
+          {
+            "node": "Merge Both Modes",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
     },
     "Merge Both Modes": {
-      "main": [[{"node": "Pyodide Faculty Assignment Engine", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "Pyodide Faculty Assignment Engine",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Pyodide Faculty Assignment Engine": {
-      "main": [[{"node": "Format for Airtable", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "Format for Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Format for Airtable": {
-      "main": [[{"node": "Batch Records", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "Batch Records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Batch Records": {
-      "main": [[{"node": "Wait (Rate Limiting)", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "Wait (Rate Limiting)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Wait (Rate Limiting)": {
-      "main": [[{"node": "Create Faculty Assignments", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "Create Faculty Assignments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Create Faculty Assignments": {
-      "main": [[{"node": "Phase 3 Completion Summary", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "Phase 3 Completion Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {

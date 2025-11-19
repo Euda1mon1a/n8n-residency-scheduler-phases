@@ -1,13 +1,16 @@
 {
   "name": "Combined Medical Residency Scheduler - Phase 0: Absence Loading",
-  "version": "2.0.0", 
+  "version": "2.0.0",
   "description": "Phase 0: Early Absence Processing - Load all approved faculty and resident absences upfront to eliminate post-hoc overrides",
   "nodes": [
     {
       "parameters": {},
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [100, 300],
+      "position": [
+        100,
+        300
+      ],
       "id": "trigger-phase0-start",
       "name": "Start Phase 0: Absence Loading"
     },
@@ -29,7 +32,10 @@
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [300, 200],
+      "position": [
+        300,
+        200
+      ],
       "id": "fetch-approved-faculty-leave",
       "name": "Fetch Approved Faculty Leave",
       "credentials": {
@@ -57,7 +63,10 @@
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [300, 300],
+      "position": [
+        300,
+        300
+      ],
       "id": "fetch-approved-resident-absences",
       "name": "Fetch Approved Resident Absences",
       "credentials": {
@@ -85,7 +94,10 @@
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [300, 400],
+      "position": [
+        300,
+        400
+      ],
       "id": "fetch-active-faculty-reference",
       "name": "Fetch Active Faculty Reference",
       "credentials": {
@@ -113,7 +125,10 @@
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [300, 500],
+      "position": [
+        300,
+        500
+      ],
       "id": "fetch-resident-reference",
       "name": "Fetch Resident Reference",
       "credentials": {
@@ -141,7 +156,10 @@
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [300, 600],
+      "position": [
+        300,
+        600
+      ],
       "id": "fetch-absence-templates",
       "name": "Fetch Absence Templates",
       "credentials": {
@@ -157,29 +175,38 @@
       },
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
-      "position": [500, 400],
+      "position": [
+        500,
+        400
+      ],
       "id": "merge-absence-data",
       "name": "Merge All Absence Data"
     },
     {
       "parameters": {
         "jsCode": "\n// PHASE 0: ABSENCE LOADING AND PROCESSING ENGINE\nconsole.log('=== PHASE 0: ABSENCE LOADING ENGINE ===');\n\nconst allItems = $input.all();\nconsole.log(`Received ${allItems.length} data sources`);\n\n// Field name mappings for all Phase 0 tables\nconst FIELD_MAP = {\n  // Faculty Leave table (tblJvewumPqMBl6Ut)\n  FL_FACULTY: 'Faculty',\n  FL_LEAVE_START: 'Leave Start',\n  FL_LEAVE_END: 'Leave End',\n  FL_LEAVE_TYPE: 'Leave Type',\n  FL_LEAVE_REQUEST: 'Leave Request',\n  FL_COMMENTS: 'Comments',\n  FL_LEAVE_COMMENTS: 'Leave Comments',\n  FL_TIME_OF_DAY: 'Time of Day',\n  FL_LEAVE_APPROVED_RESIDENCY: 'Leave Approved Residency',\n  FL_LEAVE_APPROVED_ARMY: 'Leave Approved Army',\n  \n  // Resident Absences table (tblQl3C95p0UE6F0P)\n  RA_RESIDENT: 'Resident',\n  RA_ABSENCE_START: 'Absence Start',\n  RA_ABSENCE_END: 'Absence End',\n  RA_ABSENCE_TYPE: 'Absence Type',\n  RA_COMMENTS: 'Comments',\n  RA_ABSENCE_APPROVED: 'Absence Approved',\n  \n  // Faculty Reference table (tblmgzodmqTsJ5inf)\n  FR_FACULTY: 'Faculty',\n  FR_LAST_NAME: 'Last Name',\n  FR_FIRST_NAME: 'First Name',\n  FR_FACULTY_STATUS: 'Faculty Status',\n  FR_PERFORMS_PROCEDURE: 'Performs Procedure',\n  FR_AVAILABLE_MONDAY: 'Available Monday',\n  FR_AVAILABLE_TUESDAY: 'Available Tuesday',\n  FR_AVAILABLE_WEDNESDAY: 'Available Wednesday',\n  FR_AVAILABLE_THURSDAY: 'Available Thursday',\n  FR_AVAILABLE_FRIDAY: 'Available Friday',\n  \n  // Resident Reference table (tbl3TfpZSGYGxLCIG) - using Phase 2 field IDs where applicable\n  RR_RESIDENT: 'fldq0D4a6GevQSbhz',\n  RR_RESIDENT_NAME: 'Resident Name',\n  RR_BLOCK_NUMBER: 'Block Number',\n  RR_PGY_LEVEL: 'PGY Level',\n  \n  // Absence Templates table (tblLUzjfad4B1GQ1a)\n  AT_NAME: 'Name',\n  AT_CATEGORY: 'Category'\n};\n\n// Separate data by type\nlet facultyLeaveRecords = [];\nlet residentAbsenceRecords = [];\nlet facultyReferenceData = [];\nlet residentReferenceData = [];\nlet absenceTemplates = [];\n\nallItems.forEach(item => {\n  const data = item.json;\n  \n  // Identify data source by checking key fields (using field name mappings)\n  if ((data[FIELD_MAP.FL_LEAVE_START] || data['Leave Start']) && \n      (data[FIELD_MAP.FL_LEAVE_END] || data['Leave End']) && \n      (data[FIELD_MAP.FL_FACULTY] || data['Faculty'])) {\n    facultyLeaveRecords.push(data);\n  } else if ((data[FIELD_MAP.RA_ABSENCE_START] || data['Absence Start']) && \n             (data[FIELD_MAP.RA_ABSENCE_END] || data['Absence End']) && \n             (data[FIELD_MAP.RA_RESIDENT] || data['Resident'])) {\n    residentAbsenceRecords.push(data);\n  } else if ((data[FIELD_MAP.FR_FACULTY] || data['Faculty']) && \n             (data[FIELD_MAP.FR_LAST_NAME] || data['Last Name']) && \n             !(data[FIELD_MAP.FL_LEAVE_START] || data['Leave Start'])) {\n    facultyReferenceData.push(data);\n  } else if ((data[FIELD_MAP.RR_RESIDENT] || data['Resident']) && \n             (data[FIELD_MAP.RR_BLOCK_NUMBER] || data['Block Number'])) {\n    residentReferenceData.push(data);\n  } else if ((data[FIELD_MAP.AT_NAME] || data['Name']) && \n             ((data[FIELD_MAP.AT_NAME] || data['Name']).includes('Leave') || \n              (data[FIELD_MAP.AT_NAME] || data['Name']).includes('OFF') || \n              (data[FIELD_MAP.AT_NAME] || data['Name']).includes('TDY'))) {\n    absenceTemplates.push(data);\n  }\n});\n\nconsole.log(`Faculty leave records: ${facultyLeaveRecords.length}`);\nconsole.log(`Resident absence records: ${residentAbsenceRecords.length}`);\nconsole.log(`Faculty reference data: ${facultyReferenceData.length}`);\nconsole.log(`Resident reference data: ${residentReferenceData.length}`);\nconsole.log(`Absence templates: ${absenceTemplates.length}`);\n\n// Create reference lookup maps\nconst facultyLookup = new Map();\nfacultyReferenceData.forEach(faculty => {\n  facultyLookup.set(faculty.id, {\n    id: faculty.id,\n    name: (faculty[FIELD_MAP.FR_FACULTY] || faculty['Faculty']) || (faculty[FIELD_MAP.FR_LAST_NAME] || faculty['Last Name']),\n    lastName: faculty[FIELD_MAP.FR_LAST_NAME] || faculty['Last Name'],\n    firstName: faculty[FIELD_MAP.FR_FIRST_NAME] || faculty['First Name'],\n    isActive: (faculty[FIELD_MAP.FR_FACULTY_STATUS] || faculty['Faculty Status']) !== 'Inactive'\n  });\n});\n\nconst residentLookup = new Map();\nresidentReferenceData.forEach(resident => {\n  const residentIds = resident[FIELD_MAP.RR_RESIDENT] || resident['Resident'] || [];\n  residentIds.forEach(residentId => {\n    if (!residentLookup.has(residentId)) {\n      residentLookup.set(residentId, {\n        id: residentId,\n        name: resident[FIELD_MAP.RR_RESIDENT_NAME] || resident['Resident Name'] || 'Unknown Resident',\n        pgyLevel: resident[FIELD_MAP.RR_PGY_LEVEL] || resident['PGY Level'] || 'Unknown'\n      });\n    }\n  });\n});\n\n// Create absence template lookup\nconst absenceTemplateLookup = new Map();\nabsenceTemplates.forEach(template => {\n  const name = template[FIELD_MAP.AT_NAME] || template['Name'];\n  absenceTemplateLookup.set(name, {\n    id: template.id,\n    name: name,\n    category: template[FIELD_MAP.AT_CATEGORY] || template['Category'] || 'Absence',\n    timeOfDay: name.includes('AM') ? 'AM' : (name.includes('PM') ? 'PM' : 'All Day'),\n    isLeaveTemplate: true\n  });\n});\n\n// CORE FUNCTION: Expand date ranges\nfunction expandDateRange(startDate, endDate) {\n  const dates = [];\n  const start = new Date(startDate);\n  const end = new Date(endDate);\n  \n  // Ensure we include both start and end dates\n  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {\n    dates.push(d.toISOString().split('T')[0]);\n  }\n  \n  return dates;\n}\n\n// CORE FUNCTION: Get best absence template\nfunction getAbsenceTemplate(leaveType, timeOfDay, comments) {\n  const searches = [\n    `${leaveType} ${timeOfDay}`,        // \"Medical Leave AM\"\n    `Leave ${timeOfDay}`,               // \"Leave AM\" \n    `OFF ${timeOfDay}`,                 // \"OFF AM\"\n    `Absence ${timeOfDay}`,             // \"Absence AM\"\n    leaveType,                          // \"Medical Leave\"\n    'Leave',                            // \"Leave\"\n    'OFF',                              // \"OFF\"\n    'Absence'                           // \"Absence\"\n  ];\n  \n  for (const search of searches) {\n    if (absenceTemplateLookup.has(search)) {\n      return absenceTemplateLookup.get(search);\n    }\n  }\n  \n  // Return default template as fallback\n  return {\n    id: 'default_absence_template',\n    name: 'Leave',\n    category: 'Default Absence',\n    timeOfDay: 'All Day'\n  };\n}\n\n// PHASE 0A: PROCESS FACULTY LEAVE INTO LOOKUP MAP\nconsole.log('\\n--- PROCESSING FACULTY LEAVE ---');\n\nconst facultyAbsenceMap = new Map();\nconst facultyAbsenceStats = {\n  totalLeaveRecords: facultyLeaveRecords.length,\n  totalLeaveDays: 0,\n  facultyWithLeave: new Set(),\n  leavesByType: {}\n};\n\nfacultyLeaveRecords.forEach(leave => {\n  const facultyIds = leave[FIELD_MAP.FL_FACULTY] || leave['Faculty'] || [];\n  const startDate = leave[FIELD_MAP.FL_LEAVE_START] || leave['Leave Start'];\n  const endDate = leave[FIELD_MAP.FL_LEAVE_END] || leave['Leave End'];\n  const leaveType = (leave[FIELD_MAP.FL_LEAVE_TYPE] || leave['Leave Type']) || (leave[FIELD_MAP.FL_LEAVE_REQUEST] || leave['Leave Request']) || 'Leave';\n  const comments = (leave[FIELD_MAP.FL_COMMENTS] || leave['Comments']) || (leave[FIELD_MAP.FL_LEAVE_COMMENTS] || leave['Leave Comments']) || '';\n  \n  // Expand date range for all dates in leave period\n  const leaveDates = expandDateRange(startDate, endDate);\n  facultyAbsenceStats.totalLeaveDays += leaveDates.length * facultyIds.length;\n  \n  // Track leave types\n  facultyAbsenceStats.leavesByType[leaveType] = \n    (facultyAbsenceStats.leavesByType[leaveType] || 0) + leaveDates.length;\n  \n  facultyIds.forEach(facultyId => {\n    facultyAbsenceStats.facultyWithLeave.add(facultyId);\n    \n    if (!facultyAbsenceMap.has(facultyId)) {\n      facultyAbsenceMap.set(facultyId, new Map());\n    }\n    \n    const facultyAbsences = facultyAbsenceMap.get(facultyId);\n    \n    leaveDates.forEach(date => {\n      // Create absence record for this date\n      const absenceRecord = {\n        date: date,\n        leaveType: leaveType,\n        comments: comments,\n        replacementActivity: comments || leaveType, // VERBATIM REPLACEMENT\n        originalLeaveId: leave.id,\n        leaveStart: startDate,\n        leaveEnd: endDate,\n        timeOfDay: 'All Day', // Can be refined based on comments\n        absenceTemplate: getAbsenceTemplate(leaveType, 'All Day', comments),\n        auditTrail: {\n          createdBy: 'Phase 0 Absence Loader',\n          createdAt: new Date().toISOString(),\n          leaveRecordId: leave.id\n        }\n      };\n      \n      // Key by date for fast O(1) lookup\n      facultyAbsences.set(date, absenceRecord);\n    });\n  });\n});\n\nfacultyAbsenceStats.facultyWithLeave = facultyAbsenceStats.facultyWithLeave.size;\n\n// PHASE 0B: PROCESS RESIDENT ABSENCES INTO LOOKUP MAP\nconsole.log('\\n--- PROCESSING RESIDENT ABSENCES ---');\n\nconst residentAbsenceMap = new Map();\nconst residentAbsenceStats = {\n  totalAbsenceRecords: residentAbsenceRecords.length,\n  totalAbsenceDays: 0,\n  residentsWithAbsences: new Set(),\n  absencesByType: {}\n};\n\nresidentAbsenceRecords.forEach(absence => {\n  const residentIds = absence[FIELD_MAP.RA_RESIDENT] || absence['Resident'] || [];\n  const startDate = absence[FIELD_MAP.RA_ABSENCE_START] || absence['Absence Start'];\n  const endDate = absence[FIELD_MAP.RA_ABSENCE_END] || absence['Absence End'];\n  const absenceType = absence[FIELD_MAP.RA_ABSENCE_TYPE] || absence['Absence Type'] || 'Medical Leave';\n  const comments = absence[FIELD_MAP.RA_COMMENTS] || absence['Comments'] || '';\n  \n  // Expand date range\n  const absenceDates = expandDateRange(startDate, endDate);\n  residentAbsenceStats.totalAbsenceDays += absenceDates.length * residentIds.length;\n  \n  // Track absence types\n  residentAbsenceStats.absencesByType[absenceType] = \n    (residentAbsenceStats.absencesByType[absenceType] || 0) + absenceDates.length;\n  \n  residentIds.forEach(residentId => {\n    residentAbsenceStats.residentsWithAbsences.add(residentId);\n    \n    if (!residentAbsenceMap.has(residentId)) {\n      residentAbsenceMap.set(residentId, new Map());\n    }\n    \n    const residentAbsences = residentAbsenceMap.get(residentId);\n    \n    absenceDates.forEach(date => {\n      const absenceRecord = {\n        date: date,\n        absenceType: absenceType,\n        comments: comments,\n        replacementActivity: comments || absenceType, // VERBATIM REPLACEMENT\n        originalAbsenceId: absence.id,\n        absenceStart: startDate,\n        absenceEnd: endDate,\n        timeOfDay: 'All Day',\n        absenceTemplate: getAbsenceTemplate(absenceType, 'All Day', comments),\n        educationalImpact: calculateEducationalImpact(absenceType, absenceDates.length),\n        auditTrail: {\n          createdBy: 'Phase 0 Absence Loader',\n          createdAt: new Date().toISOString(),\n          absenceRecordId: absence.id\n        }\n      };\n      \n      residentAbsences.set(date, absenceRecord);\n    });\n  });\n});\n\nresidentAbsenceStats.residentsWithAbsences = residentAbsenceStats.residentsWithAbsences.size;\n\n// Helper function for educational impact assessment\nfunction calculateEducationalImpact(absenceType, dayCount) {\n  if (dayCount > 5) {\n    return {\n      severity: 'High',\n      requiresMakeup: true,\n      reason: 'Extended absence > 5 days'\n    };\n  } else if (dayCount > 2) {\n    return {\n      severity: 'Moderate',\n      requiresMakeup: false,\n      reason: 'Short-term absence 3-5 days'\n    };\n  } else {\n    return {\n      severity: 'Low',\n      requiresMakeup: false,\n      reason: 'Brief absence <= 2 days'\n    };\n  }\n}\n\n// PHASE 0C: CREATE FAST LOOKUP FUNCTIONS\nconsole.log('\\n--- CREATING LOOKUP FUNCTIONS ---');\n\n// Convert Maps to Objects for JSON serialization and create lookup functions\nconst facultyAbsenceObject = {};\nfor (const [facultyId, absenceMap] of facultyAbsenceMap) {\n  facultyAbsenceObject[facultyId] = {};\n  for (const [date, absenceRecord] of absenceMap) {\n    facultyAbsenceObject[facultyId][date] = absenceRecord;\n  }\n}\n\nconst residentAbsenceObject = {};\nfor (const [residentId, absenceMap] of residentAbsenceMap) {\n  residentAbsenceObject[residentId] = {};\n  for (const [date, absenceRecord] of absenceMap) {\n    residentAbsenceObject[residentId][date] = absenceRecord;\n  }\n}\n\n// Create serializable lookup structures\nconst phase0Output = {\n  facultyAbsences: facultyAbsenceObject,\n  residentAbsences: residentAbsenceObject,\n  \n  // Reference data for other phases\n  facultyReference: Object.fromEntries(facultyLookup),\n  residentReference: Object.fromEntries(residentLookup),\n  absenceTemplateReference: Object.fromEntries(absenceTemplateLookup),\n  \n  // Statistics and metadata\n  statistics: {\n    faculty: facultyAbsenceStats,\n    residents: residentAbsenceStats,\n    totalAbsenceDays: facultyAbsenceStats.totalLeaveDays + residentAbsenceStats.totalAbsenceDays,\n    processingTimestamp: new Date().toISOString()\n  },\n  \n  // Lookup helper functions (as strings that can be eval'd)\n  lookupFunctions: {\n    isFacultyAbsent: `\n      function(facultyId, date, timeOfDay = 'All Day') {\n        return this.facultyAbsences[facultyId] && \n               this.facultyAbsences[facultyId][date] &&\n               (this.facultyAbsences[facultyId][date].timeOfDay === 'All Day' || \n                this.facultyAbsences[facultyId][date].timeOfDay === timeOfDay);\n      }\n    `,\n    isResidentAbsent: `\n      function(residentId, date, timeOfDay = 'All Day') {\n        return this.residentAbsences[residentId] && \n               this.residentAbsences[residentId][date] &&\n               (this.residentAbsences[residentId][date].timeOfDay === 'All Day' || \n                this.residentAbsences[residentId][date].timeOfDay === timeOfDay);\n      }\n    `,\n    getFacultyAbsence: `\n      function(facultyId, date) {\n        return this.facultyAbsences[facultyId] && \n               this.facultyAbsences[facultyId][date] || null;\n      }\n    `,\n    getResidentAbsence: `\n      function(residentId, date) {\n        return this.residentAbsences[residentId] && \n               this.residentAbsences[residentId][date] || null;\n      }\n    `\n  }\n};\n\nconsole.log('\\n=== PHASE 0 RESULTS ===');\nconsole.log(`Faculty with leave: ${facultyAbsenceStats.facultyWithLeave}`);\nconsole.log(`Total faculty leave days: ${facultyAbsenceStats.totalLeaveDays}`);\nconsole.log(`Residents with absences: ${residentAbsenceStats.residentsWithAbsences}`);\nconsole.log(`Total resident absence days: ${residentAbsenceStats.totalAbsenceDays}`);\nconsole.log(`Total absence days processed: ${facultyAbsenceStats.totalLeaveDays + residentAbsenceStats.totalAbsenceDays}`);\nconsole.log(`Absence templates loaded: ${absenceTemplates.length}`);\n\n// Show sample faculty absences\nconst sampleFacultyId = Object.keys(facultyAbsenceObject)[0];\nif (sampleFacultyId) {\n  const sampleAbsences = Object.keys(facultyAbsenceObject[sampleFacultyId]).slice(0, 3);\n  console.log('\\n=== SAMPLE FACULTY ABSENCES ===');\n  sampleAbsences.forEach((date, index) => {\n    const absence = facultyAbsenceObject[sampleFacultyId][date];\n    console.log(`${index + 1}. ${date}: ${absence.leaveType} - \"${absence.comments}\"`);\n  });\n}\n\n// Show sample resident absences\nconst sampleResidentId = Object.keys(residentAbsenceObject)[0];\nif (sampleResidentId) {\n  const sampleAbsences = Object.keys(residentAbsenceObject[sampleResidentId]).slice(0, 3);\n  console.log('\\n=== SAMPLE RESIDENT ABSENCES ===');\n  sampleAbsences.forEach((date, index) => {\n    const absence = residentAbsenceObject[sampleResidentId][date];\n    console.log(`${index + 1}. ${date}: ${absence.absenceType} - \"${absence.comments}\"`);\n  });\n}\n\nreturn [{\n  json: {\n    phase: 0,\n    phase_name: 'Absence Loading Complete',\n    success: true,\n    absence_data: phase0Output,\n    next_phase: 1,\n    ready_for_integration: true,\n    processing_timestamp: new Date().toISOString(),\n    performance_gains: {\n      estimated_phase5_elimination: '8 minutes saved',\n      estimated_phase6_reduction: '86% cleanup reduction',\n      estimated_total_runtime_savings: '71.7% (53 → 15 minutes)',\n      prevention_of_unnecessary_assignments: '15-20%'\n    }\n  }\n}];\n"
-        },
+      },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [700, 400],
+      "position": [
+        700,
+        400
+      ],
       "id": "phase0-absence-processing-engine",
       "name": "Phase 0: Absence Processing Engine"
     },
     {
       "parameters": {
         "jsCode": "// PHASE 0: FORMAT ABSENCE DATA FOR SUBSEQUENT PHASES\nconsole.log('=== FORMATTING PHASE 0 OUTPUT FOR INTEGRATION ===');\n\nconst phase0Results = $input.first().json;\nconst absenceData = phase0Results.absence_data;\n\n// Create integration-ready data structures\nconst integrationData = {\n  // Core absence lookup maps (optimized for Phases 1-3)\n  facultyAbsenceLookup: absenceData.facultyAbsences,\n  residentAbsenceLookup: absenceData.residentAbsences,\n  \n  // Helper functions for quick checks (as eval-able strings)\n  quickLookupHelpers: {\n    // Check if faculty is available on specific date/time\n    isFacultyAvailable: `\n      function(facultyId, date, timeOfDay = 'All Day') {\n        const absences = this.facultyAbsenceLookup[facultyId];\n        if (!absences) return true;\n        \n        const dayAbsence = absences[date];\n        if (!dayAbsence) return true;\n        \n        // Check time conflicts\n        return !(dayAbsence.timeOfDay === 'All Day' || \n                dayAbsence.timeOfDay === timeOfDay);\n      }\n    `,\n    \n    // Get replacement activity for absent faculty\n    getFacultyReplacementActivity: `\n      function(facultyId, date, originalActivity) {\n        const absences = this.facultyAbsenceLookup[facultyId];\n        if (!absences || !absences[date]) return originalActivity;\n        \n        const absence = absences[date];\n        // VERBATIM REPLACEMENT from comments\n        return absence.replacementActivity || absence.leaveType;\n      }\n    `,\n    \n    // Check if resident is available\n    isResidentAvailable: `\n      function(residentId, date, timeOfDay = 'All Day') {\n        const absences = this.residentAbsenceLookup[residentId];\n        if (!absences) return true;\n        \n        const dayAbsence = absences[date];\n        if (!dayAbsence) return true;\n        \n        return !(dayAbsence.timeOfDay === 'All Day' || \n                dayAbsence.timeOfDay === timeOfDay);\n      }\n    `,\n    \n    // Get replacement activity for absent resident\n    getResidentReplacementActivity: `\n      function(residentId, date, originalActivity) {\n        const absences = this.residentAbsenceLookup[residentId];\n        if (!absences || !absences[date]) return originalActivity;\n        \n        const absence = absences[date];\n        return absence.replacementActivity || absence.absenceType;\n      }\n    `\n  },\n  \n  // Pre-computed availability calendars for performance\n  availabilityCalendars: createAvailabilityCalendars(absenceData),\n  \n  // Reference data for name lookups\n  references: {\n    faculty: absenceData.facultyReference,\n    residents: absenceData.residentReference,\n    absenceTemplates: absenceData.absenceTemplateReference\n  },\n  \n  // Statistics for monitoring and reporting\n  absenceStatistics: absenceData.statistics,\n  \n  // Configuration for subsequent phases\n  phaseIntegrationConfig: {\n    eliminatePhase5: true,\n    enableEarlyAbsenceSubstitution: true,\n    preventOrphanAssignments: true,\n    enableVerbatimReplacement: true,\n    trackAuditTrail: true\n  }\n};\n\n// Helper function to create availability calendars\nfunction createAvailabilityCalendars(absenceData) {\n  const calendars = {\n    facultyUnavailableDates: {},\n    residentUnavailableDates: {},\n    dailyUnavailabilitySummary: {}\n  };\n  \n  // Create faculty unavailability calendar\n  Object.keys(absenceData.facultyAbsences).forEach(facultyId => {\n    const absences = absenceData.facultyAbsences[facultyId];\n    calendars.facultyUnavailableDates[facultyId] = Object.keys(absences);\n  });\n  \n  // Create resident unavailability calendar\n  Object.keys(absenceData.residentAbsences).forEach(residentId => {\n    const absences = absenceData.residentAbsences[residentId];\n    calendars.residentUnavailableDates[residentId] = Object.keys(absences);\n  });\n  \n  // Create daily summary (for quick \"how many people are out today\" checks)\n  const allDates = new Set();\n  \n  // Collect all dates with absences\n  Object.values(absenceData.facultyAbsences).forEach(absences => {\n    Object.keys(absences).forEach(date => allDates.add(date));\n  });\n  Object.values(absenceData.residentAbsences).forEach(absences => {\n    Object.keys(absences).forEach(date => allDates.add(date));\n  });\n  \n  // For each date, count unavailable people\n  allDates.forEach(date => {\n    let facultyOut = 0;\n    let residentsOut = 0;\n    \n    Object.values(absenceData.facultyAbsences).forEach(absences => {\n      if (absences[date]) facultyOut++;\n    });\n    \n    Object.values(absenceData.residentAbsences).forEach(absences => {\n      if (absences[date]) residentsOut++;\n    });\n    \n    calendars.dailyUnavailabilitySummary[date] = {\n      facultyUnavailable: facultyOut,\n      residentsUnavailable: residentsOut,\n      totalUnavailable: facultyOut + residentsOut,\n      impactLevel: (facultyOut + residentsOut) > 5 ? 'High' : \n                  (facultyOut + residentsOut) > 2 ? 'Medium' : 'Low'\n    };\n  });\n  \n  return calendars;\n}\n\n// Create phase integration instructions\nconst phaseIntegrationInstructions = {\n  phase1Instructions: {\n    description: 'Integrate absence checking during block pairing',\n    keyChanges: [\n      'Check faculty availability before creating pairings',\n      'Apply verbatim comment replacement immediately',\n      'Skip pairings for unavailable faculty (prevents orphans)',\n      'Use absence templates for replacement activities'\n    ],\n    implementationHint: 'Modify pairing algorithm to call isFacultyAvailable() before assignment'\n  },\n  \n  phase2Instructions: {\n    description: 'Integrate resident absence checking during association',\n    keyChanges: [\n      'Check resident availability before creating associations',\n      'Apply absence substitutions during association creation',\n      'Track educational impact of resident absences',\n      'Generate makeup requirements automatically'\n    ],\n    implementationHint: 'Filter residents by availability before association logic'\n  },\n  \n  phase3Instructions: {\n    description: 'Integrate absence-aware faculty assignment generation',\n    keyChanges: [\n      'Pre-filter available faculty for each time slot',\n      'Apply faculty leave substitutions immediately',\n      'Respect time-of-day absence restrictions',\n      'Generate audit trails for all substitutions'\n    ],\n    implementationHint: 'Use availabilityCalendars for fast pre-filtering'\n  },\n  \n  phase5Elimination: {\n    description: 'Phase 5 (Leave Override Processing) is now ELIMINATED',\n    rationale: 'All absence processing happens in Phases 1-3',\n    timesSaved: '8 minutes per execution',\n    complexityReduced: '~2000 lines of override logic removed'\n  },\n  \n  phase6Optimization: {\n    description: 'Phase 6 cleanup is now 86% faster',\n    rationale: 'No orphaned assignments from absence conflicts',\n    timeSaved: '31 minutes per execution (36 → 5 minutes)',\n    issuesEliminated: 'Orphaned assignments, absence conflicts, data integrity issues'\n  }\n};\n\nconsole.log(`Integration data prepared for ${Object.keys(integrationData.facultyAbsenceLookup).length} faculty members`);\nconsole.log(`Integration data prepared for ${Object.keys(integrationData.residentAbsenceLookup).length} residents`);\nconsole.log(`Availability calendars created for ${Object.keys(integrationData.availabilityCalendars.dailyUnavailabilitySummary).length} dates`);\n\nreturn [{\n  json: {\n    phase: 0,\n    phase_name: 'Absence Loading - Integration Ready',\n    success: true,\n    integration_data: integrationData,\n    integration_instructions: phaseIntegrationInstructions,\n    performance_projections: {\n      total_runtime_reduction: '71.7%',\n      phase5_elimination: '100% (8 minutes)',\n      phase6_optimization: '86% (31 minutes)',\n      orphan_prevention: '15-20% fewer unnecessary assignments',\n      data_integrity_improvement: '95%+ integrity from start'\n    },\n    next_steps: [\n      'Integrate absence checking in Phase 1 block pairing',\n      'Integrate absence checking in Phase 2 resident association',\n      'Integrate absence-aware faculty assignment in Phase 3',\n      'Remove Phase 5 (Leave Override Processing)',\n      'Optimize Phase 6 for reduced cleanup workload'\n    ],\n    ready_for_deployment: true,\n    processing_timestamp: new Date().toISOString()\n  }\n}];"
-        },
-        "type": "n8n-nodes-base.code",
-        "typeVersion": 2,
-        "position": [900, 400],
-        "id": "format-phase0-integration",
-        "name": "Format Phase 0 for Integration"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        900,
+        400
+      ],
+      "id": "format-phase0-integration",
+      "name": "Format Phase 0 for Integration"
     }
   ],
   "connections": {
@@ -192,7 +219,7 @@
             "index": 0
           },
           {
-            "node": "Fetch Approved Resident Absences", 
+            "node": "Fetch Approved Resident Absences",
             "type": "main",
             "index": 0
           },
@@ -203,7 +230,7 @@
           },
           {
             "node": "Fetch Resident Reference",
-            "type": "main", 
+            "type": "main",
             "index": 0
           },
           {
@@ -252,7 +279,7 @@
         [
           {
             "node": "Merge All Absence Data",
-            "type": "main", 
+            "type": "main",
             "index": 3
           }
         ]
@@ -311,7 +338,7 @@
     },
     "input_sources": [
       "Faculty Leave table (approved leave only)",
-      "Resident Absences table (approved absences only)", 
+      "Resident Absences table (approved absences only)",
       "Active Faculty reference data",
       "Resident reference data",
       "Absence template definitions"
@@ -354,7 +381,7 @@
     "next_phase_integration": {
       "phase_1_modifications": "Add absence checking before pairing creation",
       "phase_2_modifications": "Add resident availability filtering",
-      "phase_3_modifications": "Add faculty absence-aware assignment logic", 
+      "phase_3_modifications": "Add faculty absence-aware assignment logic",
       "phase_5_removal": "Complete elimination of leave override processing",
       "phase_6_optimization": "Reduced cleanup due to fewer orphaned assignments"
     }

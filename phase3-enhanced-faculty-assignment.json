@@ -1,13 +1,16 @@
 {
   "name": "Combined Medical Residency Scheduler - Phase 3 Enhanced: Absence-Aware Faculty Assignment",
-  "version": "2.0.0", 
+  "version": "2.0.0",
   "description": "Phase 3: Enhanced Faculty Assignment Generation - Integrates with Phase 0 absence data and Phase 1/2 smart assignments for ACGME-compliant supervision",
   "nodes": [
     {
       "parameters": {},
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [100, 400],
+      "position": [
+        100,
+        400
+      ],
       "id": "trigger-phase3-start",
       "name": "Start Phase 3: Enhanced Faculty Assignment"
     },
@@ -17,7 +20,10 @@
       },
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
-      "position": [500, 400],
+      "position": [
+        500,
+        400
+      ],
       "id": "merge-for-phase3-enhanced",
       "name": "Merge Data for Enhanced Phase 3"
     },
@@ -27,7 +33,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [700, 400],
+      "position": [
+        700,
+        400
+      ],
       "id": "phase3-enhanced-faculty-assignment",
       "name": "Phase 3: Enhanced Faculty Assignment Engine"
     },
@@ -37,7 +46,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [900, 400],
+      "position": [
+        900,
+        400
+      ],
       "id": "format-enhanced-faculty-assignments",
       "name": "Format Enhanced Faculty Assignments"
     },
@@ -48,7 +60,10 @@
       },
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
-      "position": [1100, 400],
+      "position": [
+        1100,
+        400
+      ],
       "id": "batch-enhanced-records",
       "name": "Batch Enhanced Records"
     },
@@ -58,7 +73,10 @@
       },
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
-      "position": [1300, 400],
+      "position": [
+        1300,
+        400
+      ],
       "id": "wait-phase3-enhanced",
       "name": "Wait (Rate Limiting)",
       "webhookId": "phase3-enhanced-wait"
@@ -76,7 +94,10 @@
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1500, 400],
+      "position": [
+        1500,
+        400
+      ],
       "id": "create-enhanced-faculty-assignments",
       "name": "Create Enhanced Faculty Assignments",
       "credentials": {
@@ -92,7 +113,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1700, 400],
+      "position": [
+        1700,
+        400
+      ],
       "id": "phase3-enhanced-completion-summary",
       "name": "Phase 3 Enhanced Completion Summary"
     }

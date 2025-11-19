@@ -5,9 +5,12 @@
   "nodes": [
     {
       "parameters": {},
-      "type": "n8n-nodes-base.manualTrigger", 
+      "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [100, 400],
+      "position": [
+        100,
+        400
+      ],
       "id": "trigger-emergency-coverage",
       "name": "Emergency Coverage Trigger"
     },
@@ -17,7 +20,10 @@
       },
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
-      "position": [500, 400],
+      "position": [
+        500,
+        400
+      ],
       "id": "merge-for-emergency-analysis",
       "name": "Merge Emergency Data"
     },
@@ -27,7 +33,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [700, 400],
+      "position": [
+        700,
+        400
+      ],
       "id": "emergency-coverage-engine",
       "name": "Emergency Coverage Engine"
     }
@@ -76,14 +85,14 @@
     ],
     "emergency_scenarios_supported": {
       "faculty_deployment": {
-        "priority": "CRITICAL", 
+        "priority": "CRITICAL",
         "typical_duration": "weeks to months",
         "short_notice": "24-48 hours",
         "coverage_requirements": "Full replacement with qualified personnel"
       },
       "faculty_tdy": {
         "priority": "HIGH",
-        "typical_duration": "days to weeks", 
+        "typical_duration": "days to weeks",
         "short_notice": "48-72 hours",
         "coverage_requirements": "Temporary coverage or redistribution"
       },
@@ -114,7 +123,7 @@
     },
     "integration_with_existing_phases": {
       "uses_phase0_absence_data": "Integrates with existing absence processing",
-      "respects_phase1_3_assignments": "Works with existing schedule structure", 
+      "respects_phase1_3_assignments": "Works with existing schedule structure",
       "maintains_acgme_compliance": "Ensures supervision and duty hour compliance",
       "preserves_equity": "Considers workload distribution in replacements"
     }

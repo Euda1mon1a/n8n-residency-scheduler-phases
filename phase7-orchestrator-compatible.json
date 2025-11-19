@@ -7,7 +7,10 @@
       "parameters": {},
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [100, 400],
+      "position": [
+        100,
+        400
+      ],
       "id": "trigger-phase7-start",
       "name": "Start Phase 7: Final Validation"
     },
@@ -29,7 +32,10 @@
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [300, 200],
+      "position": [
+        300,
+        200
+      ],
       "id": "fetch-final-master-assignments",
       "name": "Fetch Final Master Assignments",
       "credentials": {
@@ -57,7 +63,10 @@
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [300, 300],
+      "position": [
+        300,
+        300
+      ],
       "id": "fetch-final-faculty-assignments",
       "name": "Fetch Final Faculty Assignments",
       "credentials": {
@@ -85,7 +94,10 @@
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [300, 400],
+      "position": [
+        300,
+        400
+      ],
       "id": "fetch-final-call-assignments",
       "name": "Fetch Final Call Assignments",
       "credentials": {
@@ -113,7 +125,10 @@
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [300, 500],
+      "position": [
+        300,
+        500
+      ],
       "id": "fetch-active-faculty-data",
       "name": "Fetch Active Faculty Data",
       "credentials": {
@@ -141,7 +156,10 @@
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [300, 600],
+      "position": [
+        300,
+        600
+      ],
       "id": "fetch-resident-data",
       "name": "Fetch Resident Data",
       "credentials": {
@@ -157,7 +175,10 @@
       },
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
-      "position": [500, 400],
+      "position": [
+        500,
+        400
+      ],
       "id": "merge-for-phase7",
       "name": "Merge Data for Phase 7"
     },
@@ -167,7 +188,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [700, 400],
+      "position": [
+        700,
+        400
+      ],
       "id": "phase7-validation-engine",
       "name": "Phase 7: Final Validation Engine"
     }

@@ -7,7 +7,10 @@
       "parameters": {},
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [100, 400],
+      "position": [
+        100,
+        400
+      ],
       "id": "trigger-phase2-start",
       "name": "Start Phase 2: Smart Resident Association"
     },
@@ -29,7 +32,10 @@
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [300, 200],
+      "position": [
+        300,
+        200
+      ],
       "id": "fetch-phase1-master-assignments",
       "name": "Fetch Phase 1 Master Assignments",
       "credentials": {
@@ -57,7 +63,10 @@
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [300, 300],
+      "position": [
+        300,
+        300
+      ],
       "id": "fetch-residency-block-schedule",
       "name": "Fetch Residency Block Schedule",
       "credentials": {
@@ -85,7 +94,10 @@
       },
       "type": "n8n-nodes-base.airtable",
       "typeVersion": 2.1,
-      "position": [300, 400],
+      "position": [
+        300,
+        400
+      ],
       "id": "fetch-half-day-blocks-reference",
       "name": "Fetch Half-Day Blocks Reference",
       "credentials": {
@@ -101,7 +113,10 @@
       },
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
-      "position": [500, 350],
+      "position": [
+        500,
+        350
+      ],
       "id": "merge-phase2-data",
       "name": "Merge Phase 2 Data"
     },
@@ -111,7 +126,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [700, 400],
+      "position": [
+        700,
+        400
+      ],
       "id": "phase2-smart-association-engine",
       "name": "Phase 2: Smart Association Engine"
     },
@@ -121,7 +139,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [900, 400],
+      "position": [
+        900,
+        400
+      ],
       "id": "format-resident-associations-for-airtable",
       "name": "Format Resident Associations for Airtable"
     },
@@ -132,7 +153,10 @@
       },
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
-      "position": [1100, 400],
+      "position": [
+        1100,
+        400
+      ],
       "id": "batch-resident-association-records",
       "name": "Batch Resident Association Records"
     },
@@ -142,7 +166,10 @@
       },
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
-      "position": [1300, 400],
+      "position": [
+        1300,
+        400
+      ],
       "id": "wait-phase2-rate-limit",
       "name": "Wait (Rate Limiting)",
       "webhookId": "phase2-smart-wait"
@@ -160,7 +187,10 @@
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1500, 400],
+      "position": [
+        1500,
+        400
+      ],
       "id": "update-master-assignments-with-residents",
       "name": "Update Master Assignments with Residents",
       "credentials": {
@@ -176,7 +206,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1700, 400],
+      "position": [
+        1700,
+        400
+      ],
       "id": "phase2-completion-summary",
       "name": "Phase 2 Completion Summary"
     }
