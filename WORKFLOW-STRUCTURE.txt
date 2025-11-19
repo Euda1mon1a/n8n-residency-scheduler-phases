@@ -1,0 +1,157 @@
+═══════════════════════════════════════════════════════════════════════════════════════
+  CONSOLIDATED WORKFLOW VISUAL STRUCTURE
+═══════════════════════════════════════════════════════════════════════════════════════
+
+File: scheduler-master-consolidated-v1.json
+Total Width: 19,200px | 100 Nodes | 89 Connections
+
+═══════════════════════════════════════════════════════════════════════════════════════
+
+X: 0px               X: 2000px            X: 4000px            X: 6000px            
+┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐
+│  ORCHESTRATOR   │  │    PHASE 0      │  │    PHASE 1      │  │    PHASE 2      │
+│     (ORCH_)     │  │     (P0_)       │  │     (P1_)       │  │     (P2_)       │
+├─────────────────┤  ├─────────────────┤  ├─────────────────┤  ├─────────────────┤
+│                 │  │                 │  │                 │  │                 │
+│  16 NODES       │  │  9 NODES        │  │  15 NODES       │  │  11 NODES       │
+│                 │  │                 │  │                 │  │                 │
+│ • Start Master  │  │ • Fetch Leave   │  │ • Fetch Blocks  │  │ • Fetch Master  │
+│ • Initialize    │  │ • Fetch Faculty │  │ • Fetch Rotaion │  │ • Fetch Resi.   │
+│ • Execute P0    │  │   Absences      │  │   Templates     │  │   Schedule      │
+│ • Execute P1    │  │ • Fetch Resi.   │  │ • Fetch Faculty │  │ • Merge Data    │
+│ • Execute P2    │  │   Absences      │  │ • Merge Data    │  │ • Association   │
+│ • Execute P3    │  │ • Merge Data    │  │ • Smart Pairing │  │   Engine        │
+│ • Execute P4    │  │ • Absence Load  │  │   Engine        │  │                 │
+│ • Skip P5       │  │   Engine        │  │                 │  │                 │
+│ • Execute P6    │  │                 │  │                 │  │                 │
+│ • Execute P7    │  │                 │  │                 │  │                 │
+│ • Execute P8    │  │                 │  │                 │  │                 │
+│ • Execute P9    │  │                 │  │                 │  │                 │
+│ • Complete      │  │                 │  │                 │  │                 │
+│                 │  │                 │  │                 │  │                 │
+└─────────────────┘  └─────────────────┘  └─────────────────┘  └─────────────────┘
+
+X: 8000px            X: 10000px           X: 12000px           X: 14000px          
+┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐
+│    PHASE 3      │  │    PHASE 4      │  │    PHASE 6      │  │    PHASE 7      │
+│     (P3_)       │  │     (P4_)       │  │     (P6_)       │  │     (P7_)       │
+├─────────────────┤  ├─────────────────┤  ├─────────────────┤  ├─────────────────┤
+│                 │  │                 │  │                 │  │                 │
+│  19 NODES       │  │  8 NODES        │  │  5 NODES        │  │  8 NODES        │
+│                 │  │                 │  │                 │  │                 │
+│ • Fetch Half    │  │ • Fetch Call    │  │ • Fetch Final   │  │ • Fetch Master  │
+│   Days          │  │   Schedule      │  │   Master        │  │   Assignments   │
+│ • Fetch Faculty │  │ • Fetch Call    │  │ • Fetch Final   │  │ • Fetch Faculty │
+│ • Fetch Master  │  │   Assignments   │  │   Faculty       │  │   Assignments   │
+│ • Fetch PGY     │  │ • Merge Data    │  │ • Merge Data    │  │ • Fetch Call    │
+│   Distribution  │  │ • Call Sched.   │  │ • Cleanup       │  │   Assignments   │
+│ • Merge Data    │  │   Engine        │  │   Engine        │  │ • Fetch Faculty │
+│ • Faculty       │  │                 │  │                 │  │   Data          │
+│   Assignment    │  │                 │  │                 │  │ • Fetch Resident│
+│   Engine        │  │                 │  │                 │  │   Data          │
+│                 │  │                 │  │                 │  │ • Merge Data    │
+│                 │  │                 │  │                 │  │ • Validation    │
+│                 │  │                 │  │                 │  │   Engine        │
+└─────────────────┘  └─────────────────┘  └─────────────────┘  └─────────────────┘
+
+X: 16000px           X: 18000px          
+┌─────────────────┐  ┌─────────────────┐
+│    PHASE 8      │  │    PHASE 9      │
+│     (P8_)       │  │     (P9_)       │
+├─────────────────┤  ├─────────────────┤
+│                 │  │                 │
+│  3 NODES        │  │  6 NODES        │
+│                 │  │                 │
+│ • Emergency     │  │ • Start Excel   │
+│   Coverage      │  │   Export        │
+│   Trigger       │  │ • Merge Phase   │
+│ • Merge Data    │  │   Results       │
+│ • Coverage      │  │ • Excel Format  │
+│   Engine        │  │   Engine        │
+│                 │  │ • File Gen.     │
+│                 │  │ • Generate File │
+│                 │  │ • Completion    │
+└─────────────────┘  └─────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════════════
+
+DATA FLOW (Simplified):
+
+ORCH → P0 → P1 → P2 → P3 → P4 → (P5 Skipped) → P6 → P7 → P8 → P9 → Complete
+
+  ↓       ↓      ↓      ↓      ↓      ↓                ↓      ↓      ↓      ↓
+Start   Absence Smart  Resi.  Fac.   Call           Clean  Valid  Emerg  Excel
+        Loading Pair   Assoc  Assign Sched          Up     Report Cover  Export
+
+═══════════════════════════════════════════════════════════════════════════════════════
+
+NODE NAMING CONVENTION:
+
+Format: {PREFIX}_{Original Node Name}
+
+Examples:
+  ORCH_Start Master Orchestrator
+  P0_Fetch Leave Records
+  P1_Smart Pairing Engine
+  P2_Resident Association Engine
+  P3_Enhanced Faculty Assignment Engine
+  P4_Enhanced Call Scheduling Engine
+  P6_Minimal Cleanup Engine
+  P7_Final Validation Engine
+  P8_Emergency Coverage Engine
+  P9_Excel Export Engine
+
+═══════════════════════════════════════════════════════════════════════════════════════
+
+CONNECTION MAPPING:
+
+All connections use the new namespaced node IDs:
+
+ORCH_Initialize Orchestrator
+  → ORCH_Execute Phase 0: Absence Loading
+    → ORCH_Execute Phase 1: Block Pairing
+      → ORCH_Execute Phase 2: Resident Association
+        → ORCH_Execute Phase 3: Faculty Assignment
+          → ORCH_Execute Phase 4: Call Scheduling
+            → ORCH_Execute Phase 6: Minimal Cleanup
+              → ORCH_Execute Phase 7: Final Validation
+                → ORCH_Execute Phase 8: Emergency Coverage
+                  → ORCH_Execute Phase 9: Excel Export
+                    → ORCH_Complete Orchestration
+
+Within each phase, nodes maintain their original connection logic.
+
+═══════════════════════════════════════════════════════════════════════════════════════
+
+PHASE-SPECIFIC NODE COUNTS:
+
+Orchestrator:  16 nodes  (Master control and sequencing)
+Phase 0:        9 nodes  (Absence data loading)
+Phase 1:       15 nodes  (Block pairing with faculty)
+Phase 2:       11 nodes  (Resident-block association)
+Phase 3:       19 nodes  (Faculty assignment - largest phase)
+Phase 4:        8 nodes  (Call scheduling)
+Phase 6:        5 nodes  (Cleanup and validation - smallest phase)
+Phase 7:        8 nodes  (Final ACGME validation)
+Phase 8:        3 nodes  (Emergency coverage)
+Phase 9:        6 nodes  (Excel export generation)
+              --------
+TOTAL:        100 nodes
+
+═══════════════════════════════════════════════════════════════════════════════════════
+
+IMPORT & NAVIGATION TIPS:
+
+1. IMPORT: Drag scheduler-master-consolidated-v1.json into n8n
+
+2. ZOOM OUT: Press Ctrl+Minus (or Cmd+Minus) to see all phases
+
+3. USE MINIMAP: Bottom-right corner shows entire canvas
+
+4. NAVIGATE: Click minimap to jump to specific phase
+
+5. SELECT PHASE: Click and drag around phase nodes (look for prefix)
+
+6. FIND NODES: Use search (Ctrl+F) with prefix (e.g., "P3_")
+
+═══════════════════════════════════════════════════════════════════════════════════════
