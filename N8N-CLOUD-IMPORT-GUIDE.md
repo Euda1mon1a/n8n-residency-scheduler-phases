@@ -2,9 +2,12 @@
 
 ## ✅ Ready for Import
 
-**File to upload:** `scheduler-master-consolidated-v1-cloud-ready-fixed.json` ⭐ **USE THIS ONE**
+**File to upload:** `scheduler-master-consolidated-v1-FINAL-CLOUD-READY.json` ⭐ **USE THIS ONE**
 
-~~`scheduler-master-consolidated-v1-cloud-ready.json`~~ (deprecated - missing mode parameters)
+Previous versions (deprecated):
+- ~~`scheduler-master-consolidated-v1-cloud-ready-fixed.json`~~ (old)
+- ~~`scheduler-master-consolidated-v1-cloud-ready.json`~~ (old)
+- ~~`scheduler-master-consolidated-v1.json`~~ (has credentials)
 
 ## What Was Fixed
 
@@ -62,7 +65,7 @@ All 28 Code nodes were missing the required `mode` parameter, causing the `toLow
 
 2. **Import Workflow**
    - Click "⋮" menu → "Import from File"
-   - Select: `scheduler-master-consolidated-v1-cloud-ready-fixed.json`
+   - Select: `scheduler-master-consolidated-v1-FINAL-CLOUD-READY.json`
    - Click "Import"
 
 3. **Configure Credentials** (After Import)
@@ -127,9 +130,10 @@ PHASE 8 (16000px) → PHASE 9 (18000px)
 
 | File | Purpose | Status |
 |------|---------|--------|
-| `scheduler-master-consolidated-v1.json` | Original with local credentials | ❌ Don't use |
-| `scheduler-master-consolidated-v1-cloud-ready.json` | No credentials, missing mode params | ❌ Deprecated |
-| `scheduler-master-consolidated-v1-cloud-ready-fixed.json` | **Complete fix with mode parameters** | ✅ **USE THIS** |
+| `scheduler-master-consolidated-v1-FINAL-CLOUD-READY.json` | **Latest - regenerated with all fixes** | ✅ **USE THIS** |
+| `scheduler-master-consolidated-v1.json` | Original with local credentials | ❌ Deprecated |
+| `scheduler-master-consolidated-v1-cloud-ready.json` | Old - missing mode params | ❌ Deprecated |
+| `scheduler-master-consolidated-v1-cloud-ready-fixed.json` | Old - outdated source files | ❌ Deprecated |
 | `test-minimal.json` | Minimal test workflow (2 nodes) | ✅ For testing |
 
 ## Next Steps After Successful Import
