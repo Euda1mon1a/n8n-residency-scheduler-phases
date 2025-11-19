@@ -32,6 +32,37 @@
       "name": "Emergency Coverage Engine"
     }
   ],
+  "connections": {
+    "Emergency Coverage Trigger": {
+      "main": [
+        [
+          {
+            "node": "Merge Emergency Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Emergency Data": {
+      "main": [
+        [
+          {
+            "node": "Emergency Coverage Engine",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
   "phase8_specifications": {
     "purpose": "Handle military-specific emergency coverage scenarios with clear audit trails and critical service protection",
     "necessity_assessment": "ESSENTIAL - Military medical residencies face unique challenges requiring specialized emergency coverage",
