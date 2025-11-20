@@ -236,7 +236,7 @@ print(f"✓ Total input items: {len(all_input_items)}")
 print("\n[2/5] Executing Phase 3 Enhanced Faculty Assignment Engine...")
 
 # Import/execute the Phase 3 code
-exec(open('/home/user/n8n-residency-scheduler-phases/phase3-enhanced-faculty-assignment-python.py').read())
+exec(open('phase3-enhanced-faculty-assignment-python.py').read())
 
 # Capture the output (the Phase 3 script sets 'output' variable)
 if 'output' in locals():
