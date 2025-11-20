@@ -6,11 +6,13 @@ Tests boundary conditions, error handling, and special scenarios for call schedu
 
 import json
 from datetime import datetime, timedelta
+from pathlib import Path
 from typing import Dict, List
 import sys
 
 # Import the test module to reuse classes
-sys.path.insert(0, '/home/user/n8n-residency-scheduler-phases')
+REPO_ROOT = Path(__file__).resolve().parent
+sys.path.insert(0, str(REPO_ROOT))
 from test_phase4_mock import CallSchedulingEngine
 
 def test_all_faculty_on_leave():

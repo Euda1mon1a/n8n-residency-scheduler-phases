@@ -9,12 +9,17 @@ This script validates the Python conversion by:
 """
 
 from datetime import datetime, timedelta, date
+from pathlib import Path
 from typing import Dict, List, Any, Optional
 import json
 
 print("="*80)
 print("PHASE 3 PYTHON VALIDATION TEST")
 print("="*80)
+
+REPO_ROOT = Path(__file__).resolve().parent
+PHASE3_SCRIPT = REPO_ROOT / "phase3-enhanced-faculty-assignment-python.py"
+PHASE3_REPORT = REPO_ROOT / "phase3_test_report.json"
 
 # =============================================================================
 # MOCK N8N ENVIRONMENT
@@ -236,7 +241,8 @@ print(f"✓ Total input items: {len(all_input_items)}")
 print("\n[2/5] Executing Phase 3 Enhanced Faculty Assignment Engine...")
 
 # Import/execute the Phase 3 code
-exec(open('/home/user/n8n-residency-scheduler-phases/phase3-enhanced-faculty-assignment-python.py').read())
+with open(PHASE3_SCRIPT, 'r') as phase3_code:
+    exec(phase3_code.read())
 
 # Capture the output (the Phase 3 script sets 'output' variable)
 if 'output' in locals():
@@ -524,10 +530,11 @@ print(f"  - Smart pairing compatible: {'✓' if phase_integration.get('smartPair
 print("\n" + "="*80)
 
 # Save test report to file
-with open('/home/user/n8n-residency-scheduler-phases/phase3_test_report.json', 'w') as f:
+with open(PHASE3_REPORT, 'w') as f:
     json.dump(test_report, f, indent=2)
 
-print("\n✓ Test report saved to: phase3_test_report.json")
+print(f"\n✓ Test report saved to: {PHASE3_REPORT.name}")
 
-# Exit with appropriate code
-exit(0 if tests_failed == 0 else 1)
+# Exit with appropriate code when executed directly
+if __name__ == "__main__":
+    exit(0 if tests_failed == 0 else 1)
