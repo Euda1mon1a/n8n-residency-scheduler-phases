@@ -2,3 +2,7 @@
 __pycache__/
 *.pyc
 *.pyo
+
+# Test artifacts
+integration_test_results_*.json
+test_data.json
