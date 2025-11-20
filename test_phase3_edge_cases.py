@@ -6,11 +6,13 @@ Tests boundary conditions, error handling, and special scenarios
 
 import json
 from datetime import datetime, timedelta
+from pathlib import Path
 from typing import Dict, List
 import sys
 
 # Import the test module to reuse classes
-sys.path.insert(0, '/home/user/n8n-residency-scheduler-phases')
+REPO_ROOT = Path(__file__).resolve().parent
+sys.path.insert(0, str(REPO_ROOT))
 from test_phase3_mock import (
     FacultyAbsenceProcessor, ACGMEComplianceEngine,
     ACGME_RATIOS, SPECIALTY_REQUIREMENTS

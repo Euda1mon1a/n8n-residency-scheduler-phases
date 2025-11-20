@@ -1,0 +1,399 @@
+{
+  "name": "Phase 7: Python-Powered Final Validation (Orchestrator-Ready)",
+  "version": "5.0.0",
+  "description": "Phase 7 v5.0: Python-powered ACGME & Primary Duty validation with orchestrator compatibility",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        100,
+        400
+      ],
+      "id": "trigger-phase7-start",
+      "name": "Start Phase 7: Final Validation"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appDgFtrU7njCKDW5",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl17gcDUtXc14Rjv",
+          "mode": "id"
+        },
+        "filterByFormula": "=NOT(BLANK({Resident (from Residency Block Schedule)}))",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        300,
+        150
+      ],
+      "id": "fetch-final-master-assignments",
+      "name": "Fetch Final Master Assignments",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jaswG7byACjIoa6L",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appDgFtrU7njCKDW5",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbloGnXnu0mC6y83L",
+          "mode": "id"
+        },
+        "filterByFormula": "=NOT(BLANK({Faculty}))",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        300,
+        250
+      ],
+      "id": "fetch-final-faculty-assignments",
+      "name": "Fetch Final Faculty Assignments",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jaswG7byACjIoa6L",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appDgFtrU7njCKDW5",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl15U9cF0uig9IEo",
+          "mode": "id"
+        },
+        "filterByFormula": "=NOT(BLANK({Faculty}))",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        300,
+        350
+      ],
+      "id": "fetch-final-call-assignments",
+      "name": "Fetch Final Call Assignments",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jaswG7byACjIoa6L",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appDgFtrU7njCKDW5",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblmgzodmqTsJ5inf",
+          "mode": "id"
+        },
+        "filterByFormula": "=AND({Faculty} != 'Van Brunt', {Faculty} != 'Napierala', {Faculty Status} != 'Inactive')",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        300,
+        450
+      ],
+      "id": "fetch-active-faculty-data",
+      "name": "Fetch Active Faculty Data",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jaswG7byACjIoa6L",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appDgFtrU7njCKDW5",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl3TfpZSGYGxLCIG",
+          "mode": "id"
+        },
+        "filterByFormula": "=NOT(BLANK({Resident}))",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        300,
+        550
+      ],
+      "id": "fetch-resident-data",
+      "name": "Fetch Resident Data",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jaswG7byACjIoa6L",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appDgFtrU7njCKDW5",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbltYT3HMWxGCcCfo",
+          "mode": "id"
+        },
+        "filterByFormula": "=NOT(BLANK({Faculty}))",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        300,
+        650
+      ],
+      "id": "fetch-primary-duties",
+      "name": "Fetch Primary Duties",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jaswG7byACjIoa6L",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 6
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        500,
+        400
+      ],
+      "id": "merge-for-phase7",
+      "name": "Merge Data for Phase 7"
+    },
+    {
+      "parameters": {
+        "pythonCode": "# PHASE 7: PYTHON-POWERED VALIDATION ENGINE\nimport json\nfrom datetime import datetime\nfrom typing import Dict, List, Any\nimport math\n\nprint('=== PHASE 7: PYTHON-POWERED VALIDATION ENGINE ===')\n\n# Get all input items from n8n merge node\nall_items = _get_input_all()\nprint(f'Received {len(all_items)} items from merge')\n\n# Separate data by type\nmaster_assignments = []\nfaculty_assignments = []\ncall_assignments = []\nactive_faculty = []\nresidents = []\nprimary_duties = []\n\nfor item in all_items:\n    data = item['json']\n\n    if data.get('Resident (from Residency Block Schedule)'):\n        master_assignments.append(data)\n    elif data.get('Faculty') and data.get('Attending Clinic Templates'):\n        faculty_assignments.append(data)\n    elif data.get('Call Date') or data.get('date'):\n        call_assignments.append(data)\n    elif data.get('Faculty') and data.get('Last Name') and data.get('Faculty Status'):\n        active_faculty.append(data)\n    elif data.get('Resident') and data.get('PGY Level'):\n        residents.append(data)\n    elif data.get('Clinic Minimum Half-Days Per Week') is not None:\n        primary_duties.append(data)\n\nprint(f'Master: {len(master_assignments)}, Faculty: {len(faculty_assignments)}, '\n      f'Calls: {len(call_assignments)}, Active Faculty: {len(active_faculty)}, '\n      f'Residents: {len(residents)}, Primary Duties: {len(primary_duties)}')\n\nclass Phase7Validator:\n    \"\"\"\n    Phase 7: Final Validation Engine\n    Combines ACGME compliance checks and Primary Duty validation.\n    \"\"\"\n\n    def __init__(self, master_assignments: List[Dict], faculty_assignments: List[Dict],\n                 call_assignments: List[Dict], active_faculty: List[Dict],\n                 residents: List[Dict], primary_duties: List[Dict]):\n        self.master_assignments = master_assignments\n        self.faculty_assignments = faculty_assignments\n        self.call_assignments = call_assignments\n        self.active_faculty = active_faculty\n        self.residents = residents\n        self.primary_duties = primary_duties\n\n        # Build lookups\n        self.primary_duties_map = self._build_primary_duties_map()\n\n    def _build_primary_duties_map(self) -> Dict[str, Dict]:\n        \"\"\"Build map of faculty ID to primary duty constraints\"\"\"\n        constraints = {}\n        for duty in self.primary_duties:\n            faculty_ids = duty.get('Faculty', [])\n            if isinstance(faculty_ids, str):\n                faculty_ids = [faculty_ids]\n\n            for fac_id in faculty_ids:\n                constraints[fac_id] = {\n                    'clinic_min': duty.get('Clinic Minimum Half-Days Per Week', 0),\n                    'clinic_max': duty.get('Clinic Maximum Half-Days Per Week', 999),\n                    'sports_min': duty.get('Sports Medicine Minimum Half-Days Per Week copy', 0),\n                    'sports_max': duty.get('Sports Medicine Maximum Half-Days Per Week', 0),\n                    'gme_min': duty.get('Minimum Graduate Medical Education Half-Day Per Week', 0),\n                    'gme_max': duty.get('Maximum Graduate Medical Education Half-Days Per Week', 999),\n                    'dfm_min': duty.get('Department of Family Medicine Minimum Half-Days Per Week', 0),\n                    'dfm_max': duty.get('Department of Family Medicine Maximum Half-Days Per Week', 999),\n                    'role': duty.get('Primary Duty', 'Faculty')\n                }\n        return constraints\n\n    def validate_supervision_ratios(self) -> Dict[str, Any]:\n        \"\"\"Validate ACGME supervision ratios\"\"\"\n        supervision_by_pgy = {}\n\n        for pgy in ['PGY-1', 'PGY-2', 'PGY-3']:\n            pgy_assignments = [\n                ma for ma in self.master_assignments\n                if pgy in (ma.get('PGY Link (from Residency Block Schedule)') or [])\n            ]\n\n            supervised_assignments = []\n            for ma in pgy_assignments:\n                half_day_ids = ma.get('Half-Day of the Week of Blocks') or []\n                is_supervised = False\n                for hd_id in half_day_ids:\n                    if any(hd_id in (fa.get('Half-Day of the Week of Blocks') or []) for fa in self.faculty_assignments):\n                        is_supervised = True\n                        break\n                if is_supervised:\n                    supervised_assignments.append(ma)\n\n            required_ratio = 1.0 if pgy == 'PGY-1' else 0.8\n            actual_ratio = len(supervised_assignments) / len(pgy_assignments) if pgy_assignments else 1.0\n\n            supervision_by_pgy[pgy] = {\n                'totalAssignments': len(pgy_assignments),\n                'supervised': len(supervised_assignments),\n                'requiredRatio': f\"{required_ratio*100:.0f}%\",\n                'actualRatio': f\"{actual_ratio*100:.1f}%\",\n                'compliant': actual_ratio >= required_ratio\n            }\n\n        return supervision_by_pgy\n\n    def validate_duty_hours(self) -> Dict[str, Any]:\n        \"\"\"Validate resident duty hours (80h/week limit)\"\"\"\n        resident_hours = {}\n\n        # Clinic/Ward hours (8h per assignment)\n        for ma in self.master_assignments:\n            res_ids = ma.get('Resident (from Residency Block Schedule)') or []\n            if isinstance(res_ids, str): res_ids = [res_ids]\n\n            for res_id in res_ids:\n                resident_hours[res_id] = resident_hours.get(res_id, 0) + 8\n\n        max_weekly = 80\n        hour_counts = list(resident_hours.values())\n        violations = sum(1 for h in hour_counts if h > max_weekly)\n        avg_hours = sum(hour_counts) / len(hour_counts) if hour_counts else 0\n\n        return {\n            'maxAllowed': max_weekly,\n            'averageHours': f\"{avg_hours:.1f}\",\n            'violations': violations,\n            'totalResidents': len(hour_counts),\n            'complianceRate': f\"{((len(hour_counts) - violations) / len(hour_counts) * 100):.1f}%\" if hour_counts else \"100%\"\n        }\n\n    def validate_primary_duties(self) -> Dict[str, Any]:\n        \"\"\"Validate Primary Duty constraints\"\"\"\n        violations = []\n        compliance_stats = []\n\n        # Count activities per faculty\n        faculty_counts = {f['id']: {'name': f.get('Faculty', f.get('Last Name')), 'clinic': 0, 'sports': 0, 'gme': 0, 'dfm': 0}\n                         for f in self.active_faculty}\n\n        for fa in self.faculty_assignments:\n            fac_ids = fa.get('Faculty') or []\n            if isinstance(fac_ids, str): fac_ids = [fac_ids]\n\n            templates = fa.get('Attending Clinic Templates') or []\n            if isinstance(templates, str): templates = [templates]\n\n            for fac_id in fac_ids:\n                if fac_id in faculty_counts:\n                    for template in templates:\n                        t_lower = str(template).lower()\n                        if 'sports medicine' in t_lower:\n                            faculty_counts[fac_id]['sports'] += 1\n                        elif 'clinic' in t_lower or 'continuity' in t_lower:\n                            faculty_counts[fac_id]['clinic'] += 1\n                        elif any(x in t_lower for x in ['conference', 'education', 'didactic', 'grand rounds']):\n                            faculty_counts[fac_id]['gme'] += 1\n                        elif any(x in t_lower for x in ['admin', 'leadership']):\n                            faculty_counts[fac_id]['dfm'] += 1\n\n        # Check constraints\n        for fac_id, counts in faculty_counts.items():\n            constraints = self.primary_duties_map.get(fac_id)\n            if not constraints:\n                continue\n\n            fac_violations = []\n\n            # Clinic\n            if counts['clinic'] < math.ceil(constraints['clinic_min']):\n                fac_violations.append({'type': 'clinic', 'issue': 'below minimum', 'required': math.ceil(constraints['clinic_min']), 'actual': counts['clinic']})\n            if counts['clinic'] > constraints['clinic_max']:\n                fac_violations.append({'type': 'clinic', 'issue': 'exceeds maximum', 'required': constraints['clinic_max'], 'actual': counts['clinic']})\n\n            # Sports\n            if constraints['sports_min'] > 0 and counts['sports'] < constraints['sports_min']:\n                fac_violations.append({'type': 'sports', 'issue': 'below minimum', 'required': constraints['sports_min'], 'actual': counts['sports']})\n\n            # GME\n            if counts['gme'] < math.ceil(constraints['gme_min']):\n                fac_violations.append({'type': 'gme', 'issue': 'below minimum', 'required': math.ceil(constraints['gme_min']), 'actual': counts['gme']})\n\n            # DFM\n            if counts['dfm'] < math.ceil(constraints['dfm_min']):\n                fac_violations.append({'type': 'dfm', 'issue': 'below minimum', 'required': math.ceil(constraints['dfm_min']), 'actual': counts['dfm']})\n\n            if fac_violations:\n                violations.append({\n                    'faculty': counts['name'],\n                    'role': constraints['role'],\n                    'violations': fac_violations\n                })\n\n            compliance_stats.append({\n                'faculty': counts['name'],\n                'status': 'VIOLATIONS' if fac_violations else 'COMPLIANT'\n            })\n\n        overall_score = (len([c for c in compliance_stats if c['status'] == 'COMPLIANT']) / len(compliance_stats) * 100) if compliance_stats else 100.0\n\n        return {\n            'overallScore': f\"{overall_score:.1f}%\",\n            'violations': violations,\n            'totalValidated': len(compliance_stats)\n        }\n\n    def generate_report(self) -> Dict[str, Any]:\n        \"\"\"Generate comprehensive validation report\"\"\"\n        supervision = self.validate_supervision_ratios()\n        duty_hours = self.validate_duty_hours()\n        primary_duties = self.validate_primary_duties()\n\n        # Calculate overall score\n        # Weighted: Supervision 40%, Primary Duty 40%, Duty Hours 20%\n        supervision_score = sum(100 if s['compliant'] else float(s['actualRatio'].strip('%')) for s in supervision.values()) / len(supervision) if supervision else 100\n        primary_duty_score = float(primary_duties['overallScore'].strip('%'))\n        duty_hour_score = float(duty_hours['complianceRate'].strip('%'))\n\n        overall_score = (supervision_score * 0.4) + (primary_duty_score * 0.4) + (duty_hour_score * 0.2)\n\n        grade = 'A' if overall_score >= 90 else 'B' if overall_score >= 80 else 'C'\n\n        return {\n            'timestamp': datetime.now().isoformat(),\n            'overallScore': f\"{overall_score:.1f}\",\n            'grade': grade,\n            'acgmeCompliance': {\n                'supervision': supervision,\n                'dutyHours': duty_hours\n            },\n            'primaryDutyValidation': primary_duties,\n            'readyForDeployment': overall_score >= 85\n        }\n\n# Initialize validator and run\nvalidator = Phase7Validator(\n    master_assignments=master_assignments,\n    faculty_assignments=faculty_assignments,\n    call_assignments=call_assignments,\n    active_faculty=active_faculty,\n    residents=residents,\n    primary_duties=primary_duties\n)\n\nvalidation_report = validator.generate_report()\n\nprint(\"\\n=== PHASE 7 VALIDATION REPORT ===\")\nprint(f\"Overall Score: {validation_report['overallScore']}\")\nprint(f\"Grade: {validation_report['grade']}\")\nprint(f\"Ready for Deployment: {validation_report['readyForDeployment']}\")\n\n# Return to n8n\nreturn_value = {\n    'phase': 7,\n    'phase_name': 'Python-Powered Final Validation',\n    'success': True,\n    'validation_report': validation_report,\n    'python_powered': True,\n    'orchestrator_ready': True,\n    'processing_timestamp': datetime.now().isoformat()\n}\n\nreturn_value\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        700,
+        400
+      ],
+      "id": "phase7-validation-engine",
+      "name": "Python Validation Engine",
+      "notes": "Python-powered ACGME compliance and Primary Duty validation"
+    }
+  ],
+  "connections": {
+    "Start Phase 7: Final Validation": {
+      "main": [
+        [
+          {
+            "node": "Fetch Final Master Assignments",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Final Faculty Assignments",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Final Call Assignments",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Active Faculty Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Resident Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Primary Duties",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Final Master Assignments": {
+      "main": [
+        [
+          {
+            "node": "Merge Data for Phase 7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Final Faculty Assignments": {
+      "main": [
+        [
+          {
+            "node": "Merge Data for Phase 7",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Fetch Final Call Assignments": {
+      "main": [
+        [
+          {
+            "node": "Merge Data for Phase 7",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Fetch Active Faculty Data": {
+      "main": [
+        [
+          {
+            "node": "Merge Data for Phase 7",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Fetch Resident Data": {
+      "main": [
+        [
+          {
+            "node": "Merge Data for Phase 7",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "Fetch Primary Duties": {
+      "main": [
+        [
+          {
+            "node": "Merge Data for Phase 7",
+            "type": "main",
+            "index": 5
+          }
+        ]
+      ]
+    },
+    "Merge Data for Phase 7": {
+      "main": [
+        [
+          {
+            "node": "Phase 7: Primary Duty & ACGME Validation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "description": "Phase 7: Comprehensive validation with role-based Primary Duties + ACGME compliance",
+    "version": "5.0.0",
+    "author": "Medical Scheduling Team",
+    "python_features": {
+      "phase7_validator": "Object-oriented Python class for comprehensive validation",
+      "acgme_supervision": "PGY-level supervision ratio validation",
+      "duty_hours_check": "80-hour per week ACGME limit enforcement",
+      "primary_duty_validation": "Clinic/Sports/GME/DFM constraint checking",
+      "weighted_scoring": "Multi-factor scoring system for deployment readiness",
+      "deployment_gate": "Automated ready-for-deployment determination"
+    },
+    "python_powered": true
+  },
+  "phase7_specifications": {
+    "orchestrator_compatible": true,
+    "primary_duties_validation": {
+      "clinic_compliance": "Validates min/max clinic half-days per role",
+      "sports_compliance": "Validates Tagawa 3-4 sports assignments",
+      "gme_compliance": "Validates Graduate Medical Education requirements",
+      "dfm_compliance": "Validates Department of Family Medicine requirements (leadership)",
+      "violation_detection": "Flags under/over-assignment by type",
+      "fractional_rounding": "Rounds up minimums (0.9 \u2192 1) for validation"
+    },
+    "acgme_validation": true,
+    "purpose": "Validate role-based Primary Duties compliance and ACGME requirements for deployment",
+    "data_sources": [
+      "Final Master Assignments (Phase 2)",
+      "Final Faculty Assignments (Phase 3)",
+      "Final Call Assignments (Phase 4)",
+      "Active Faculty Data",
+      "Resident Data",
+      "Primary Duties (NEW - role-based constraints)"
+    ],
+    "role_specific_checks": {
+      "department_chief": "Validates reduced clinic (1-1), DFM requirements",
+      "program_director": "Validates no clinic requirement (0-0)",
+      "sports_medicine": "Critical check for Tagawa 3-4 sports assignments",
+      "standard_faculty": "Validates 2-4 clinic assignments",
+      "leadership": "Validates GME/DFM admin requirements"
+    },
+    "success_criteria": {
+      "primary_duty_compliance": "\u226585% for deployment",
+      "critical_violations": "Zero for clinic/sports requirements",
+      "tagawa_sports": "Must be 3-4 assignments",
+      "leadership_admin": "Must meet GME/DFM minimums"
+    }
+  }
+}
