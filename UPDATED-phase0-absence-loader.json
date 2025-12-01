@@ -1,0 +1,241 @@
+{
+  "name": "Phase 0: Absence Loading (UPDATED - Orchestrator Compatible)",
+  "version": "2.0.0",
+  "description": "Phase 0 with Input/Output interface nodes for Orchestrator integration",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [100, 300],
+      "id": "trigger-phase0-start",
+      "name": "Start Phase 0: Absence Loading"
+    },
+    {
+      "parameters": {
+        "jsCode": "// PHASE 0 INPUT EXTRACTION - Extract orchestrator context\nconst input = $input.item.json;\n\nreturn [{\n  json: {\n    orchestratorId: input.orchestratorId || 'standalone',\n    phaseNumber: input.phaseNumber || 0,\n    phaseConfig: input.phaseConfig || {},\n    phaseRecord: input.phaseRecord || {},\n    globalState: input.globalState || {}\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [300, 300],
+      "id": "extract-input-context",
+      "name": "Extract Input Context"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appDgFtrU7njCKDW5",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblJvewumPqMBl6Ut",
+          "mode": "id"
+        },
+        "filterByFormula": "=AND({Leave Approved Residency} = TRUE(), {Leave Approved Army} = TRUE(), {Leave Start} != BLANK(), {Leave End} != BLANK())",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [300, 200],
+      "id": "fetch-approved-faculty-leave",
+      "name": "Fetch Approved Faculty Leave",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jaswG7byACjIoa6L",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appDgFtrU7njCKDW5",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblQl3C95p0UE6F0P",
+          "mode": "id"
+        },
+        "filterByFormula": "=AND({Absence Approved} = TRUE(), {Absence Start} != BLANK(), {Absence End} != BLANK())",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [300, 100],
+      "id": "fetch-approved-resident-absences",
+      "name": "Fetch Approved Resident Absences",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jaswG7byACjIoa6L",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appDgFtrU7njCKDW5",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblmgzodmqTsJ5inf",
+          "mode": "id"
+        },
+        "filterByFormula": "=AND({Faculty} != 'Van Brunt', {Faculty} != 'Napierala', {Faculty Status} != 'Inactive')",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [300, 400],
+      "id": "fetch-active-faculty-reference",
+      "name": "Fetch Active Faculty Reference",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jaswG7byACjIoa6L",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appDgFtrU7njCKDW5",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl3TfpZSGYGxLCIG",
+          "mode": "id"
+        },
+        "filterByFormula": "=NOT(BLANK({Resident}))",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [300, 500],
+      "id": "fetch-resident-reference",
+      "name": "Fetch Resident Reference",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jaswG7byACjIoa6L",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appDgFtrU7njCKDW5",
+          "mode": "id"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblLUzjfad4B1GQ1a",
+          "mode": "id"
+        },
+        "filterByFormula": "=OR({Name} = 'Medical Leave', {Name} = 'TDY', {Name} = 'Personal Leave', {Name} = 'OFF AM', {Name} = 'OFF PM', {Name} = 'Leave AM', {Name} = 'Leave PM', {Name} = 'Absence AM', {Name} = 'Absence PM')",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [300, 600],
+      "id": "fetch-absence-templates",
+      "name": "Fetch Absence Templates",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "jaswG7byACjIoa6L",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 6
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [500, 350],
+      "id": "merge-absence-data",
+      "name": "Merge All Absence Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "\n// PHASE 0: ABSENCE LOADING AND PROCESSING ENGINE (preserving original business logic)\nconsole.log('=== PHASE 0: ABSENCE LOADING ENGINE ===');\n\n// Get orchestrator context from Extract Input Context node\nconst contextNode = $('Extract Input Context');\nconst orchestratorContext = contextNode && contextNode.first() ? contextNode.first().json : {\n  orchestratorId: 'standalone',\n  phaseNumber: 0,\n  globalState: {}\n};\n\nconsole.log(`Orchestrator ID: ${orchestratorContext.orchestratorId}`);\nconsole.log(`Phase Number: ${orchestratorContext.phaseNumber}`);\n\nconst allItems = $input.all();\nconsole.log(`Received ${allItems.length} data sources`);\n\n// Field name mappings for all Phase 0 tables\nconst FIELD_MAP = {\n  FL_FACULTY: 'Faculty',\n  FL_LEAVE_START: 'Leave Start',\n  FL_LEAVE_END: 'Leave End',\n  FL_LEAVE_TYPE: 'Leave Type',\n  FL_LEAVE_REQUEST: 'Leave Request',\n  FL_COMMENTS: 'Comments',\n  FL_LEAVE_COMMENTS: 'Leave Comments',\n  FL_TIME_OF_DAY: 'Time of Day',\n  FL_LEAVE_APPROVED_RESIDENCY: 'Leave Approved Residency',\n  FL_LEAVE_APPROVED_ARMY: 'Leave Approved Army',\n  RA_RESIDENT: 'Resident',\n  RA_ABSENCE_START: 'Absence Start',\n  RA_ABSENCE_END: 'Absence End',\n  RA_ABSENCE_TYPE: 'Absence Type',\n  RA_COMMENTS: 'Comments',\n  RA_ABSENCE_APPROVED: 'Absence Approved',\n  FR_FACULTY: 'Faculty',\n  FR_LAST_NAME: 'Last Name',\n  FR_FIRST_NAME: 'First Name',\n  FR_FACULTY_STATUS: 'Faculty Status',\n  FR_PERFORMS_PROCEDURE: 'Performs Procedure',\n  RR_RESIDENT: 'fldq0D4a6GevQSbhz',\n  RR_RESIDENT_NAME: 'Resident Name',\n  RR_BLOCK_NUMBER: 'Block Number',\n  RR_PGY_LEVEL: 'PGY Level',\n  AT_NAME: 'Name',\n  AT_CATEGORY: 'Category'\n};\n\n// Separate data by type\nlet facultyLeaveRecords = [];\nlet residentAbsenceRecords = [];\nlet facultyReferenceData = [];\nlet residentReferenceData = [];\nlet absenceTemplates = [];\n\nallItems.forEach(item => {\n  const data = item.json;\n  \n  if ((data[FIELD_MAP.FL_LEAVE_START] || data['Leave Start']) && \n      (data[FIELD_MAP.FL_LEAVE_END] || data['Leave End']) && \n      (data[FIELD_MAP.FL_FACULTY] || data['Faculty'])) {\n    facultyLeaveRecords.push(data);\n  } else if ((data[FIELD_MAP.RA_ABSENCE_START] || data['Absence Start']) && \n             (data[FIELD_MAP.RA_ABSENCE_END] || data['Absence End']) && \n             (data[FIELD_MAP.RA_RESIDENT] || data['Resident'])) {\n    residentAbsenceRecords.push(data);\n  } else if ((data[FIELD_MAP.FR_FACULTY] || data['Faculty']) && \n             (data[FIELD_MAP.FR_LAST_NAME] || data['Last Name']) && \n             !(data[FIELD_MAP.FL_LEAVE_START] || data['Leave Start'])) {\n    facultyReferenceData.push(data);\n  } else if ((data[FIELD_MAP.RR_RESIDENT] || data['Resident']) && \n             (data[FIELD_MAP.RR_BLOCK_NUMBER] || data['Block Number'])) {\n    residentReferenceData.push(data);\n  } else if ((data[FIELD_MAP.AT_NAME] || data['Name']) && \n             ((data[FIELD_MAP.AT_NAME] || data['Name']).includes('Leave') || \n              (data[FIELD_MAP.AT_NAME] || data['Name']).includes('OFF') || \n              (data[FIELD_MAP.AT_NAME] || data['Name']).includes('TDY'))) {\n    absenceTemplates.push(data);\n  }\n});\n\nconsole.log(`Faculty leave records: ${facultyLeaveRecords.length}`);\nconsole.log(`Resident absence records: ${residentAbsenceRecords.length}`);\nconsole.log(`Faculty reference data: ${facultyReferenceData.length}`);\nconsole.log(`Resident reference data: ${residentReferenceData.length}`);\nconsole.log(`Absence templates: ${absenceTemplates.length}`);\n\n// Create reference lookup maps\nconst facultyLookup = new Map();\nfacultyReferenceData.forEach(faculty => {\n  facultyLookup.set(faculty.id, {\n    id: faculty.id,\n    name: (faculty[FIELD_MAP.FR_FACULTY] || faculty['Faculty']) || (faculty[FIELD_MAP.FR_LAST_NAME] || faculty['Last Name']),\n    lastName: faculty[FIELD_MAP.FR_LAST_NAME] || faculty['Last Name'],\n    firstName: faculty[FIELD_MAP.FR_FIRST_NAME] || faculty['First Name'],\n    isActive: (faculty[FIELD_MAP.FR_FACULTY_STATUS] || faculty['Faculty Status']) !== 'Inactive'\n  });\n});\n\nconst residentLookup = new Map();\nresidentReferenceData.forEach(resident => {\n  const residentIds = resident[FIELD_MAP.RR_RESIDENT] || resident['Resident'] || [];\n  residentIds.forEach(residentId => {\n    if (!residentLookup.has(residentId)) {\n      residentLookup.set(residentId, {\n        id: residentId,\n        name: resident[FIELD_MAP.RR_RESIDENT_NAME] || resident['Resident Name'] || 'Unknown Resident',\n        pgyLevel: resident[FIELD_MAP.RR_PGY_LEVEL] || resident['PGY Level'] || 'Unknown'\n      });\n    }\n  });\n});\n\nconst absenceTemplateLookup = new Map();\nabsenceTemplates.forEach(template => {\n  const name = template[FIELD_MAP.AT_NAME] || template['Name'];\n  absenceTemplateLookup.set(name, {\n    id: template.id,\n    name: name,\n    category: template[FIELD_MAP.AT_CATEGORY] || template['Category'] || 'Absence',\n    timeOfDay: name.includes('AM') ? 'AM' : (name.includes('PM') ? 'PM' : 'All Day'),\n    isLeaveTemplate: true\n  });\n});\n\n// CORE FUNCTION: Expand date ranges\nfunction expandDateRange(startDate, endDate) {\n  const dates = [];\n  const start = new Date(startDate);\n  const end = new Date(endDate);\n  \n  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {\n    dates.push(d.toISOString().split('T')[0]);\n  }\n  \n  return dates;\n}\n\n// Process faculty leave\nconst facultyAbsenceMap = new Map();\nconst facultyAbsenceStats = {\n  totalLeaveRecords: facultyLeaveRecords.length,\n  totalLeaveDays: 0,\n  facultyWithLeave: new Set()\n};\n\nfacultyLeaveRecords.forEach(leave => {\n  const facultyIds = leave[FIELD_MAP.FL_FACULTY] || leave['Faculty'] || [];\n  const startDate = leave[FIELD_MAP.FL_LEAVE_START] || leave['Leave Start'];\n  const endDate = leave[FIELD_MAP.FL_LEAVE_END] || leave['Leave End'];\n  const leaveType = (leave[FIELD_MAP.FL_LEAVE_TYPE] || leave['Leave Type']) || (leave[FIELD_MAP.FL_LEAVE_REQUEST] || leave['Leave Request']) || 'Leave';\n  const comments = (leave[FIELD_MAP.FL_COMMENTS] || leave['Comments']) || (leave[FIELD_MAP.FL_LEAVE_COMMENTS] || leave['Leave Comments']) || '';\n  \n  const leaveDates = expandDateRange(startDate, endDate);\n  facultyAbsenceStats.totalLeaveDays += leaveDates.length * facultyIds.length;\n  \n  facultyIds.forEach(facultyId => {\n    facultyAbsenceStats.facultyWithLeave.add(facultyId);\n    \n    if (!facultyAbsenceMap.has(facultyId)) {\n      facultyAbsenceMap.set(facultyId, new Map());\n    }\n    \n    const facultyAbsences = facultyAbsenceMap.get(facultyId);\n    \n    leaveDates.forEach(date => {\n      const absenceRecord = {\n        date: date,\n        leaveType: leaveType,\n        comments: comments,\n        replacementActivity: comments || leaveType,\n        originalLeaveId: leave.id,\n        leaveStart: startDate,\n        leaveEnd: endDate,\n        timeOfDay: 'All Day'\n      };\n      \n      facultyAbsences.set(date, absenceRecord);\n    });\n  });\n});\n\nfacultyAbsenceStats.facultyWithLeave = facultyAbsenceStats.facultyWithLeave.size;\n\n// Process resident absences\nconst residentAbsenceMap = new Map();\nconst residentAbsenceStats = {\n  totalAbsenceRecords: residentAbsenceRecords.length,\n  totalAbsenceDays: 0,\n  residentsWithAbsences: new Set()\n};\n\nresidentAbsenceRecords.forEach(absence => {\n  const residentIds = absence[FIELD_MAP.RA_RESIDENT] || absence['Resident'] || [];\n  const startDate = absence[FIELD_MAP.RA_ABSENCE_START] || absence['Absence Start'];\n  const endDate = absence[FIELD_MAP.RA_ABSENCE_END] || absence['Absence End'];\n  const absenceType = absence[FIELD_MAP.RA_ABSENCE_TYPE] || absence['Absence Type'] || 'Medical Leave';\n  const comments = absence[FIELD_MAP.RA_COMMENTS] || absence['Comments'] || '';\n  \n  const absenceDates = expandDateRange(startDate, endDate);\n  residentAbsenceStats.totalAbsenceDays += absenceDates.length * residentIds.length;\n  \n  residentIds.forEach(residentId => {\n    residentAbsenceStats.residentsWithAbsences.add(residentId);\n    \n    if (!residentAbsenceMap.has(residentId)) {\n      residentAbsenceMap.set(residentId, new Map());\n    }\n    \n    const residentAbsences = residentAbsenceMap.get(residentId);\n    \n    absenceDates.forEach(date => {\n      const absenceRecord = {\n        date: date,\n        absenceType: absenceType,\n        comments: comments,\n        replacementActivity: comments || absenceType,\n        originalAbsenceId: absence.id,\n        absenceStart: startDate,\n        absenceEnd: endDate,\n        timeOfDay: 'All Day'\n      };\n      \n      residentAbsences.set(date, absenceRecord);\n    });\n  });\n});\n\nresidentAbsenceStats.residentsWithAbsences = residentAbsenceStats.residentsWithAbsences.size;\n\n// Convert Maps to Objects for JSON serialization\nconst facultyAbsenceObject = {};\nfor (const [facultyId, absenceMap] of facultyAbsenceMap) {\n  facultyAbsenceObject[facultyId] = {};\n  for (const [date, absenceRecord] of absenceMap) {\n    facultyAbsenceObject[facultyId][date] = absenceRecord;\n  }\n}\n\nconst residentAbsenceObject = {};\nfor (const [residentId, absenceMap] of residentAbsenceMap) {\n  residentAbsenceObject[residentId] = {};\n  for (const [date, absenceRecord] of absenceMap) {\n    residentAbsenceObject[residentId][date] = absenceRecord;\n  }\n}\n\nconst phase0Output = {\n  facultyAbsences: facultyAbsenceObject,\n  residentAbsences: residentAbsenceObject,\n  facultyReference: Object.fromEntries(facultyLookup),\n  residentReference: Object.fromEntries(residentLookup),\n  absenceTemplateReference: Object.fromEntries(absenceTemplateLookup),\n  statistics: {\n    faculty: facultyAbsenceStats,\n    residents: residentAbsenceStats,\n    totalAbsenceDays: facultyAbsenceStats.totalLeaveDays + residentAbsenceStats.totalAbsenceDays,\n    processingTimestamp: new Date().toISOString()\n  }\n};\n\nconsole.log('\\n=== PHASE 0 RESULTS ===');\nconsole.log(`Faculty with leave: ${facultyAbsenceStats.facultyWithLeave}`);\nconsole.log(`Total faculty leave days: ${facultyAbsenceStats.totalLeaveDays}`);\nconsole.log(`Residents with absences: ${residentAbsenceStats.residentsWithAbsences}`);\nconsole.log(`Total resident absence days: ${residentAbsenceStats.totalAbsenceDays}`);\n\nreturn [{\n  json: {\n    orchestratorId: orchestratorContext.orchestratorId,\n    phaseNumber: orchestratorContext.phaseNumber,\n    phaseData: phase0Output\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 350],
+      "id": "phase0-absence-processing-engine",
+      "name": "Phase 0: Absence Processing Engine"
+    },
+    {
+      "parameters": {
+        "jsCode": "// PHASE 0 OUTPUT - Format Phase Completion Block\nconst processingResult = $input.first().json;\nconst phaseData = processingResult.phaseData;\n\nreturn [{\n  json: {\n    orchestratorId: processingResult.orchestratorId,\n    phaseNumber: processingResult.phaseNumber,\n    status: \"complete\",\n    outputs: {\n      facultyAbsencesCount: Object.keys(phaseData.facultyAbsences).length,\n      residentAbsencesCount: Object.keys(phaseData.residentAbsences).length,\n      totalLeaveDays: phaseData.statistics.totalAbsenceDays,\n      absenceData: phaseData\n    },\n    globalState: {\n      absenceData: phaseData,\n      phase0Complete: true\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 350],
+      "id": "format-phase0-output",
+      "name": "Format Phase 0 Output"
+    }
+  ],
+  "connections": {
+    "Start Phase 0: Absence Loading": {
+      "main": [[
+        {"node": "Extract Input Context", "type": "main", "index": 0},
+        {"node": "Fetch Approved Faculty Leave", "type": "main", "index": 0},
+        {"node": "Fetch Approved Resident Absences", "type": "main", "index": 0},
+        {"node": "Fetch Active Faculty Reference", "type": "main", "index": 0},
+        {"node": "Fetch Resident Reference", "type": "main", "index": 0},
+        {"node": "Fetch Absence Templates", "type": "main", "index": 0}
+      ]]
+    },
+    "Extract Input Context": {
+      "main": [[{"node": "Merge All Absence Data", "type": "main", "index": 0}]]
+    },
+    "Fetch Approved Faculty Leave": {
+      "main": [[{"node": "Merge All Absence Data", "type": "main", "index": 1}]]
+    },
+    "Fetch Approved Resident Absences": {
+      "main": [[{"node": "Merge All Absence Data", "type": "main", "index": 2}]]
+    },
+    "Fetch Active Faculty Reference": {
+      "main": [[{"node": "Merge All Absence Data", "type": "main", "index": 3}]]
+    },
+    "Fetch Resident Reference": {
+      "main": [[{"node": "Merge All Absence Data", "type": "main", "index": 4}]]
+    },
+    "Fetch Absence Templates": {
+      "main": [[{"node": "Merge All Absence Data", "type": "main", "index": 5}]]
+    },
+    "Merge All Absence Data": {
+      "main": [[{"node": "Phase 0: Absence Processing Engine", "type": "main", "index": 0}]]
+    },
+    "Phase 0: Absence Processing Engine": {
+      "main": [[{"node": "Format Phase 0 Output", "type": "main", "index": 0}]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "description": "UPDATED Phase 0 v2.0 with Input Extraction and Output Formatting for Orchestrator compatibility",
+    "version": "2.0.0",
+    "author": "Medical Scheduling Automation Team"
+  }
+}

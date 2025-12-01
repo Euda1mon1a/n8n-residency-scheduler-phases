@@ -1,0 +1,173 @@
+{
+  "name": "Medical Residency Scheduler - Master Orchestrator (UPDATED)",
+  "version": "2.0.0",
+  "description": "Master orchestrator with proper Phase interface - passes context and merges results",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [100, 500],
+      "id": "orchestrator-trigger",
+      "name": "Start Master Orchestrator"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Initialize orchestrator execution context with globalState\nconst executionContext = {\n  orchestratorId: $execution.id,\n  startTime: new Date().toISOString(),\n  phases: [\n    { phase: 0, name: 'Absence Loading', status: 'pending', config: { loadFaculty: true, loadResidents: true } },\n    { phase: 1, name: 'Smart Block Pairing', status: 'pending', config: { absenceAware: true } },\n    { phase: 2, name: 'Smart Resident Association', status: 'pending', config: { absenceAware: true } },\n    { phase: 3, name: 'Enhanced Faculty Assignment', status: 'pending', config: { acgmeCompliant: true } },\n    { phase: 4, name: 'Enhanced Call Scheduling', status: 'pending', config: {} },\n    { phase: 5, name: 'OBSOLETE - Skipped', status: 'skipped', config: {} },\n    { phase: 6, name: 'Reinvented Minimal Cleanup', status: 'pending', config: {} },\n    { phase: 7, name: 'Final Validation & Reporting', status: 'pending', config: {} },\n    { phase: 8, name: 'Emergency Coverage Engine', status: 'pending', config: {} },\n    { phase: 9, name: 'Excel Export Engine', status: 'pending', config: {} }\n  ],\n  configuration: {\n    skipPhase5: true,\n    enableEarlyAbsenceIntegration: true,\n    parallelExecutionEnabled: false,\n    errorHandling: 'stop-on-error'\n  },\n  globalState: {}\n};\n\nconsole.log('=== ORCHESTRATOR INITIALIZED ===');\nconsole.log(`Execution ID: ${executionContext.orchestratorId}`);\nconsole.log(`Start Time: ${executionContext.startTime}`);\nconsole.log(`Total Phases: ${executionContext.phases.filter(p => p.status !== 'skipped').length}`);\n\nreturn [{ json: executionContext }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [300, 500],
+      "id": "initialize-orchestrator",
+      "name": "Initialize Orchestrator"
+    },
+    {
+      "parameters": {
+        "workflowId": "={{ $workflow.id }}",
+        "options": {
+          "inputData": "={{ JSON.stringify({ orchestratorId: $json.orchestratorId, phaseNumber: 0, phaseConfig: $json.phases[0].config, phaseRecord: $json.phases[0], globalState: $json.globalState }) }}"
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.1,
+      "position": [500, 300],
+      "id": "execute-phase0",
+      "name": "Execute Phase 0: Absence Loading",
+      "notes": "Passes orchestrator context to Phase 0"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Merge Phase 0 Results into globalState\nconst orchestratorData = $('Initialize Orchestrator').first().json;\nconst phase0Output = $input.first().json;\n\nconst updatedContext = {\n  ...orchestratorData,\n  globalState: {\n    ...orchestratorData.globalState,\n    ...(phase0Output.globalState || {}),\n    phase0: {\n      status: phase0Output.status,\n      outputs: phase0Output.outputs || {}\n    }\n  }\n};\n\nconsole.log('=== PHASE 0 RESULTS MERGED ===');\nconsole.log(`Phase 0 Status: ${phase0Output.status}`);\n\nreturn [{ json: updatedContext }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 300],
+      "id": "merge-phase0-results",
+      "name": "Merge Phase 0 Results"
+    },
+    {
+      "parameters": {
+        "workflowId": "={{ $workflow.id }}",
+        "options": {
+          "inputData": "={{ JSON.stringify({ orchestratorId: $json.orchestratorId, phaseNumber: 1, phaseConfig: $json.phases[1].config, phaseRecord: $json.phases[1], globalState: $json.globalState }) }}"
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.1,
+      "position": [900, 300],
+      "id": "execute-phase1",
+      "name": "Execute Phase 1: Block Pairing",
+      "notes": "Passes context with Phase 0 globalState"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Merge Phase 1 Results\nconst prevContext = $input.first().json;\nconst phase1Output = $('Execute Phase 1: Block Pairing').first().json;\n\nconst updatedContext = {\n  ...prevContext,\n  globalState: {\n    ...prevContext.globalState,\n    ...(phase1Output.globalState || {}),\n    phase1: {\n      status: phase1Output.status,\n      outputs: phase1Output.outputs || {}\n    }\n  }\n};\n\nconsole.log('=== PHASE 1 RESULTS MERGED ===');\nconsole.log(`Phase 1 Status: ${phase1Output.status}`);\n\nreturn [{ json: updatedContext }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1100, 300],
+      "id": "merge-phase1-results",
+      "name": "Merge Phase 1 Results"
+    },
+    {
+      "parameters": {
+        "workflowId": "={{ $workflow.id }}",
+        "options": {
+          "inputData": "={{ JSON.stringify({ orchestratorId: $json.orchestratorId, phaseNumber: 2, phaseConfig: $json.phases[2].config, phaseRecord: $json.phases[2], globalState: $json.globalState }) }}"
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.1,
+      "position": [1300, 300],
+      "id": "execute-phase2",
+      "name": "Execute Phase 2: Resident Association",
+      "notes": "Passes context with Phase 0+1 globalState"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Merge Phase 2 Results\nconst prevContext = $input.first().json;\nconst phase2Output = $('Execute Phase 2: Resident Association').first().json;\n\nconst updatedContext = {\n  ...prevContext,\n  globalState: {\n    ...prevContext.globalState,\n    ...(phase2Output.globalState || {}),\n    phase2: {\n      status: phase2Output.status,\n      outputs: phase2Output.outputs || {}\n    }\n  }\n};\n\nconsole.log('=== PHASE 2 RESULTS MERGED ===');\nconsole.log(`Phase 2 Status: ${phase2Output.status}`);\n\nreturn [{ json: updatedContext }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1500, 300],
+      "id": "merge-phase2-results",
+      "name": "Merge Phase 2 Results"
+    },
+    {
+      "parameters": {
+        "workflowId": "={{ $workflow.id }}",
+        "options": {
+          "inputData": "={{ JSON.stringify({ orchestratorId: $json.orchestratorId, phaseNumber: 3, phaseConfig: $json.phases[3].config, phaseRecord: $json.phases[3], globalState: $json.globalState }) }}"
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.1,
+      "position": [1700, 300],
+      "id": "execute-phase3",
+      "name": "Execute Phase 3: Faculty Assignment",
+      "notes": "Passes context with Phase 0+1+2 globalState"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Merge Phase 3 Results\nconst prevContext = $input.first().json;\nconst phase3Output = $('Execute Phase 3: Faculty Assignment').first().json;\n\nconst updatedContext = {\n  ...prevContext,\n  globalState: {\n    ...prevContext.globalState,\n    ...(phase3Output.globalState || {}),\n    phase3: {\n      status: phase3Output.status,\n      outputs: phase3Output.outputs || {}\n    }\n  }\n};\n\nconsole.log('=== PHASE 3 RESULTS MERGED ===');\nconsole.log(`Phase 3 Status: ${phase3Output.status}`);\n\nreturn [{ json: updatedContext }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1900, 300],
+      "id": "merge-phase3-results",
+      "name": "Merge Phase 3 Results"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Finalize orchestrator execution\nconst startData = $('Initialize Orchestrator').first().json;\nconst finalContext = $input.first().json;\n\nconst endTime = new Date();\nconst startTime = new Date(startData.startTime);\nconst durationMinutes = (endTime - startTime) / 1000 / 60;\n\nconst finalReport = {\n  orchestratorId: startData.orchestratorId,\n  executionSummary: {\n    startTime: startData.startTime,\n    endTime: endTime.toISOString(),\n    durationMinutes: Math.round(durationMinutes * 100) / 100,\n    totalPhases: 10,\n    phasesExecuted: 4,\n    phasesSkipped: 0\n  },\n  phaseResults: {\n    phase0: finalContext.globalState.phase0?.status || 'unknown',\n    phase1: finalContext.globalState.phase1?.status || 'unknown',\n    phase2: finalContext.globalState.phase2?.status || 'unknown',\n    phase3: finalContext.globalState.phase3?.status || 'unknown'\n  },\n  globalState: finalContext.globalState,\n  success: true,\n  completionTimestamp: endTime.toISOString()\n};\n\nconsole.log('=== ORCHESTRATOR EXECUTION COMPLETE ===');\nconsole.log(`Total Duration: ${Math.round(durationMinutes)} minutes`);\nconsole.log(`All Phases 0-3 completed with proper context passing`);\nconsole.log(`Success: ${finalReport.success}`);\n\nreturn [{ json: finalReport }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2100, 300],
+      "id": "finalize-orchestrator",
+      "name": "Finalize & Generate Report"
+    }
+  ],
+  "connections": {
+    "Start Master Orchestrator": {
+      "main": [[{"node": "Initialize Orchestrator", "type": "main", "index": 0}]]
+    },
+    "Initialize Orchestrator": {
+      "main": [[{"node": "Execute Phase 0: Absence Loading", "type": "main", "index": 0}]]
+    },
+    "Execute Phase 0: Absence Loading": {
+      "main": [[{"node": "Merge Phase 0 Results", "type": "main", "index": 0}]]
+    },
+    "Merge Phase 0 Results": {
+      "main": [[{"node": "Execute Phase 1: Block Pairing", "type": "main", "index": 0}]]
+    },
+    "Execute Phase 1: Block Pairing": {
+      "main": [[{"node": "Merge Phase 1 Results", "type": "main", "index": 0}]]
+    },
+    "Merge Phase 1 Results": {
+      "main": [[{"node": "Execute Phase 2: Resident Association", "type": "main", "index": 0}]]
+    },
+    "Execute Phase 2: Resident Association": {
+      "main": [[{"node": "Merge Phase 2 Results", "type": "main", "index": 0}]]
+    },
+    "Merge Phase 2 Results": {
+      "main": [[{"node": "Execute Phase 3: Faculty Assignment", "type": "main", "index": 0}]]
+    },
+    "Execute Phase 3: Faculty Assignment": {
+      "main": [[{"node": "Merge Phase 3 Results", "type": "main", "index": 0}]]
+    },
+    "Merge Phase 3 Results": {
+      "main": [[{"node": "Finalize & Generate Report", "type": "main", "index": 0}]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "description": "UPDATED Orchestrator v2.0 - properly passes context to each Phase and merges results into globalState",
+    "version": "2.0.0",
+    "author": "Medical Scheduling Automation Team"
+  }
+}

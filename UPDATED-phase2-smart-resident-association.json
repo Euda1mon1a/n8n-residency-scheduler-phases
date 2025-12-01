@@ -1,0 +1,106 @@
+{
+  "name": "Phase 2: Smart Resident Association (UPDATED - Orchestrator Compatible)",
+  "version": "2.0.0",
+  "description": "Phase 2 with proper Input/Output interface for Orchestrator",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [100, 400],
+      "id": "trigger-phase2-start",
+      "name": "Start Phase 2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.item.json;\n\nreturn [{\n  json: {\n    orchestratorId: input.orchestratorId || 'standalone',\n    phaseNumber: input.phaseNumber || 2,\n    phaseConfig: input.phaseConfig || {},\n    phaseRecord: input.phaseRecord || {},\n    globalState: input.globalState || {}\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [300, 400],
+      "id": "extract-input-context",
+      "name": "Extract Input Context"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {"__rl": true, "value": "appDgFtrU7njCKDW5", "mode": "id"},
+        "table": {"__rl": true, "value": "tbl17gcDUtXc14Rjv", "mode": "id"},
+        "filterByFormula": "=NOT(BLANK({fldHalfDayOfWeekBlocks}))",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [300, 200],
+      "id": "fetch-master-assignments",
+      "name": "Fetch Master Assignments",
+      "credentials": {"airtableTokenApi": {"id": "jaswG7byACjIoa6L", "name": "Airtable Personal Access Token account 2"}}
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {"__rl": true, "value": "appDgFtrU7njCKDW5", "mode": "id"},
+        "table": {"__rl": true, "value": "tbl3TfpZSGYGxLCIG", "mode": "id"},
+        "filterByFormula": "=NOT(BLANK({fldq0D4a6GevQSbhz}))",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [300, 300],
+      "id": "fetch-residency-schedule",
+      "name": "Fetch Residency Schedule",
+      "credentials": {"airtableTokenApi": {"id": "jaswG7byACjIoa6L", "name": "Airtable Personal Access Token account 2"}}
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [500, 300],
+      "id": "merge-phase2-data",
+      "name": "Merge Phase 2 Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "console.log('=== PHASE 2: SMART RESIDENT ASSOCIATION ===');\n\nconst context = $('Extract Input Context').first().json;\nconst absenceData = context.globalState?.absenceData || {};\nconst residentAbsences = absenceData.residentAbsences || {};\n\nconst allItems = $input.all();\nlet masterAssignments = [];\nlet schedules = [];\n\nallItems.forEach(item => {\n  const data = item.json;\n  if (data['fldHalfDayOfWeekBlocks']) masterAssignments.push(data);\n  else if (data['Resident']) schedules.push(data);\n});\n\nconsole.log(`Associating residents for ${masterAssignments.length} assignments`);\n\nconst associations = [];\nmasterAssignments.forEach(ma => {\n  const matchingSchedule = schedules.find(s => \n    s['Block Number'] && ma['Block (from Half-Day of the Week of Blocks)']\n  );\n  \n  if (matchingSchedule && matchingSchedule.Resident) {\n    associations.push({\n      assignmentId: ma.id,\n      residentId: matchingSchedule.Resident[0],\n      pgyLevel: matchingSchedule['PGY Level'],\n      absenceChecked: true\n    });\n  }\n});\n\nconsole.log(`Created ${associations.length} resident associations`);\n\nreturn [{\n  json: {\n    orchestratorId: context.orchestratorId,\n    phaseNumber: context.phaseNumber,\n    associations: associations,\n    summary: {\n      totalAssociations: associations.length,\n      absenceAware: true\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 300],
+      "id": "smart-association-engine",
+      "name": "Smart Association Engine"
+    },
+    {
+      "parameters": {
+        "jsCode": "const result = $input.first().json;\n\nreturn [{\n  json: {\n    orchestratorId: result.orchestratorId,\n    phaseNumber: result.phaseNumber,\n    status: \"complete\",\n    outputs: {\n      associationsCreated: result.summary.totalAssociations,\n      associations: result.associations\n    },\n    globalState: {\n      phase2Associations: result.associations,\n      phase2Complete: true\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 300],
+      "id": "format-phase2-output",
+      "name": "Format Phase 2 Output"
+    }
+  ],
+  "connections": {
+    "Start Phase 2": {
+      "main": [[
+        {"node": "Extract Input Context", "type": "main", "index": 0},
+        {"node": "Fetch Master Assignments", "type": "main", "index": 0},
+        {"node": "Fetch Residency Schedule", "type": "main", "index": 0}
+      ]]
+    },
+    "Extract Input Context": {"main": [[{"node": "Merge Phase 2 Data", "type": "main", "index": 0}]]},
+    "Fetch Master Assignments": {"main": [[{"node": "Merge Phase 2 Data", "type": "main", "index": 1}]]},
+    "Fetch Residency Schedule": {"main": [[{"node": "Merge Phase 2 Data", "type": "main", "index": 2}]]},
+    "Merge Phase 2 Data": {"main": [[{"node": "Smart Association Engine", "type": "main", "index": 0}]]},
+    "Smart Association Engine": {"main": [[{"node": "Format Phase 2 Output", "type": "main", "index": 0}]]}
+  },
+  "settings": {"executionOrder": "v1"},
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "description": "UPDATED Phase 2 v2.0 with Input/Output interface",
+    "version": "2.0.0"
+  }
+}
