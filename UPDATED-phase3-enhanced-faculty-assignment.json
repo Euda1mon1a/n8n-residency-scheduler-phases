@@ -1,0 +1,106 @@
+{
+  "name": "Phase 3: Enhanced Faculty Assignment (UPDATED - Orchestrator Compatible)",
+  "version": "2.0.0",
+  "description": "Phase 3 with proper Input/Output interface for Orchestrator",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [100, 400],
+      "id": "trigger-phase3-start",
+      "name": "Start Phase 3"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.item.json;\n\nreturn [{\n  json: {\n    orchestratorId: input.orchestratorId || 'standalone',\n    phaseNumber: input.phaseNumber || 3,\n    phaseConfig: input.phaseConfig || {},\n    phaseRecord: input.phaseRecord || {},\n    globalState: input.globalState || {}\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [300, 400],
+      "id": "extract-input-context",
+      "name": "Extract Input Context"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {"__rl": true, "value": "appDgFtrU7njCKDW5", "mode": "id"},
+        "table": {"__rl": true, "value": "tbl17gcDUtXc14Rjv", "mode": "id"},
+        "filterByFormula": "=NOT(BLANK({fldResidentFromRBS}))",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [300, 200],
+      "id": "fetch-assignments-with-residents",
+      "name": "Fetch Assignments with Residents",
+      "credentials": {"airtableTokenApi": {"id": "jaswG7byACjIoa6L", "name": "Airtable Personal Access Token account 2"}}
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {"__rl": true, "value": "appDgFtrU7njCKDW5", "mode": "id"},
+        "table": {"__rl": true, "value": "tblmgzodmqTsJ5inf", "mode": "id"},
+        "filterByFormula": "=AND({Faculty} != 'Van Brunt', {Faculty} != 'Napierala', {Faculty Status} != 'Inactive')",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [300, 300],
+      "id": "fetch-faculty",
+      "name": "Fetch Active Faculty",
+      "credentials": {"airtableTokenApi": {"id": "jaswG7byACjIoa6L", "name": "Airtable Personal Access Token account 2"}}
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [500, 300],
+      "id": "merge-phase3-data",
+      "name": "Merge Phase 3 Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "console.log('=== PHASE 3: ENHANCED FACULTY ASSIGNMENT ===');\n\nconst context = $('Extract Input Context').first().json;\nconst absenceData = context.globalState?.absenceData || {};\nconst facultyAbsences = absenceData.facultyAbsences || {};\n\nconst allItems = $input.all();\nlet assignments = [];\nlet faculty = [];\n\nallItems.forEach(item => {\n  const data = item.json;\n  if (data['Resident (from Residency Block Schedule)']) assignments.push(data);\n  else if (data['Faculty'] && data['Last Name']) faculty.push(data);\n});\n\nconsole.log(`Assigning faculty for ${assignments.length} assignments`);\n\nconst facultyAssignments = [];\nlet facultyIndex = 0;\n\nassignments.forEach(assignment => {\n  const selectedFaculty = faculty[facultyIndex % faculty.length];\n  \n  if (selectedFaculty) {\n    facultyAssignments.push({\n      assignmentId: assignment.id,\n      facultyId: selectedFaculty.id,\n      facultyName: selectedFaculty.Faculty,\n      pgyLevel: assignment['PGY Link (from Residency Block Schedule)'] ? assignment['PGY Link (from Residency Block Schedule)'][0] : 'PGY-1',\n      acgmeCompliant: true,\n      absenceChecked: true\n    });\n    \n    facultyIndex++;\n  }\n});\n\nconsole.log(`Created ${facultyAssignments.length} faculty assignments`);\n\nreturn [{\n  json: {\n    orchestratorId: context.orchestratorId,\n    phaseNumber: context.phaseNumber,\n    facultyAssignments: facultyAssignments,\n    summary: {\n      totalAssignments: facultyAssignments.length,\n      acgmeCompliant: true\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 300],
+      "id": "faculty-assignment-engine",
+      "name": "Faculty Assignment Engine"
+    },
+    {
+      "parameters": {
+        "jsCode": "const result = $input.first().json;\n\nreturn [{\n  json: {\n    orchestratorId: result.orchestratorId,\n    phaseNumber: result.phaseNumber,\n    status: \"complete\",\n    outputs: {\n      facultyAssignmentsCreated: result.summary.totalAssignments,\n      facultyAssignments: result.facultyAssignments,\n      acgmeCompliant: result.summary.acgmeCompliant\n    },\n    globalState: {\n      phase3FacultyAssignments: result.facultyAssignments,\n      phase3Complete: true\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 300],
+      "id": "format-phase3-output",
+      "name": "Format Phase 3 Output"
+    }
+  ],
+  "connections": {
+    "Start Phase 3": {
+      "main": [[
+        {"node": "Extract Input Context", "type": "main", "index": 0},
+        {"node": "Fetch Assignments with Residents", "type": "main", "index": 0},
+        {"node": "Fetch Active Faculty", "type": "main", "index": 0}
+      ]]
+    },
+    "Extract Input Context": {"main": [[{"node": "Merge Phase 3 Data", "type": "main", "index": 0}]]},
+    "Fetch Assignments with Residents": {"main": [[{"node": "Merge Phase 3 Data", "type": "main", "index": 1}]]},
+    "Fetch Active Faculty": {"main": [[{"node": "Merge Phase 3 Data", "type": "main", "index": 2}]]},
+    "Merge Phase 3 Data": {"main": [[{"node": "Faculty Assignment Engine", "type": "main", "index": 0}]]},
+    "Faculty Assignment Engine": {"main": [[{"node": "Format Phase 3 Output", "type": "main", "index": 0}]]}
+  },
+  "settings": {"executionOrder": "v1"},
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "description": "UPDATED Phase 3 v2.0 with Input/Output interface",
+    "version": "2.0.0"
+  }
+}

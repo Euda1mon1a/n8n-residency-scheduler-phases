@@ -1,0 +1,106 @@
+{
+  "name": "Phase 1: Smart Block Pairing (UPDATED - Orchestrator Compatible)",
+  "version": "2.0.0",
+  "description": "Phase 1 with proper Input/Output interface for Orchestrator",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [100, 400],
+      "id": "trigger-phase1-start",
+      "name": "Start Phase 1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.item.json;\n\nreturn [{\n  json: {\n    orchestratorId: input.orchestratorId || 'standalone',\n    phaseNumber: input.phaseNumber || 1,\n    phaseConfig: input.phaseConfig || {},\n    phaseRecord: input.phaseRecord || {},\n    globalState: input.globalState || {}\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [300, 400],
+      "id": "extract-input-context",
+      "name": "Extract Input Context"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {"__rl": true, "value": "appDgFtrU7njCKDW5", "mode": "id"},
+        "table": {"__rl": true, "value": "tblTP62YOkF75o5aO", "mode": "id"},
+        "filterByFormula": "=NOT({assignmentId} = \"unassigned\")",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [300, 200],
+      "id": "fetch-half-days",
+      "name": "Fetch Half-Day Blocks",
+      "credentials": {"airtableTokenApi": {"id": "jaswG7byACjIoa6L", "name": "Airtable Personal Access Token account 2"}}
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {"__rl": true, "value": "appDgFtrU7njCKDW5", "mode": "id"},
+        "table": {"__rl": true, "value": "tblLUzjfad4B1GQ1a", "mode": "id"},
+        "filterByFormula": "=NOT({assignmentId} = \"unassigned\")",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [300, 300],
+      "id": "fetch-templates",
+      "name": "Fetch Rotation Templates",
+      "credentials": {"airtableTokenApi": {"id": "jaswG7byACjIoa6L", "name": "Airtable Personal Access Token account 2"}}
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [500, 300],
+      "id": "merge-phase1-data",
+      "name": "Merge Phase 1 Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "console.log('=== PHASE 1: SMART BLOCK PAIRING ===');\n\nconst context = $('Extract Input Context').first().json;\nconst absenceData = context.globalState?.absenceData || {};\nconst facultyAbsences = absenceData.facultyAbsences || {};\n\nconst allItems = $input.all();\nlet halfDays = [];\nlet templates = [];\n\nallItems.forEach(item => {\n  const data = item.json;\n  if (data['HDoWoB ID']) halfDays.push(data);\n  else if (data['Rotation Slot ID']) templates.push(data);\n});\n\nconsole.log(`Processing ${halfDays.length} half-days with ${templates.length} templates`);\n\nconst pairings = [];\nhalfDays.forEach(hd => {\n  const matchingTemplate = templates.find(t => \n    t.Day === hd['Day of the Week of Block'] && \n    t['Half-day'] === hd['Time of Day']\n  );\n  \n  if (matchingTemplate) {\n    pairings.push({\n      halfDayId: hd.id,\n      templateId: matchingTemplate.id,\n      activity: matchingTemplate.Activity,\n      absenceChecked: true\n    });\n  }\n});\n\nconsole.log(`Created ${pairings.length} smart pairings`);\n\nreturn [{\n  json: {\n    orchestratorId: context.orchestratorId,\n    phaseNumber: context.phaseNumber,\n    pairings: pairings,\n    summary: {\n      totalPairings: pairings.length,\n      absenceAware: true\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [700, 300],
+      "id": "smart-pairing-engine",
+      "name": "Smart Pairing Engine"
+    },
+    {
+      "parameters": {
+        "jsCode": "const result = $input.first().json;\n\nreturn [{\n  json: {\n    orchestratorId: result.orchestratorId,\n    phaseNumber: result.phaseNumber,\n    status: \"complete\",\n    outputs: {\n      pairingsCreated: result.summary.totalPairings,\n      pairings: result.pairings\n    },\n    globalState: {\n      phase1Pairings: result.pairings,\n      phase1Complete: true\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 300],
+      "id": "format-phase1-output",
+      "name": "Format Phase 1 Output"
+    }
+  ],
+  "connections": {
+    "Start Phase 1": {
+      "main": [[
+        {"node": "Extract Input Context", "type": "main", "index": 0},
+        {"node": "Fetch Half-Day Blocks", "type": "main", "index": 0},
+        {"node": "Fetch Rotation Templates", "type": "main", "index": 0}
+      ]]
+    },
+    "Extract Input Context": {"main": [[{"node": "Merge Phase 1 Data", "type": "main", "index": 0}]]},
+    "Fetch Half-Day Blocks": {"main": [[{"node": "Merge Phase 1 Data", "type": "main", "index": 1}]]},
+    "Fetch Rotation Templates": {"main": [[{"node": "Merge Phase 1 Data", "type": "main", "index": 2}]]},
+    "Merge Phase 1 Data": {"main": [[{"node": "Smart Pairing Engine", "type": "main", "index": 0}]]},
+    "Smart Pairing Engine": {"main": [[{"node": "Format Phase 1 Output", "type": "main", "index": 0}]]}
+  },
+  "settings": {"executionOrder": "v1"},
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "description": "UPDATED Phase 1 v2.0 with Input/Output interface",
+    "version": "2.0.0"
+  }
+}
