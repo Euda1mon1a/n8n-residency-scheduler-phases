@@ -52,8 +52,28 @@ If you want to customize or rebuild the consolidation:
 - This approach is an alternative to the modular orchestrator pattern used in the main repository
 - Both approaches are valid - choose based on your deployment needs
 
-## Source Branch
+## Historical Context
+
+### Source Branch
 
 These files were extracted from branch: `claude/consolidate-n8n-workflows-01YUderKwjuaqoTX5ZHqU4n2`
+
+**Branch Status:** Archived (December 2025)
+
+**Extraction Details:**
+- **Date Extracted:** December 3, 2025
+- **Commit Range:** 14 unique commits focused on workflow consolidation
+- **Divergence Point:** Commit `afca4cd` (Merge pull request #16)
+- **Files Extracted:** All consolidation-specific resources (workflows, guides, utilities)
+
+**Why Archived:**
+The consolidation branch served its purpose by developing and testing the consolidated workflow approach. All valuable outputs have been extracted to this directory. The branch contained modified versions of core files (README, workflow JSONs) that evolved differently than main, making a full merge impractical. Rather than merge conflicting histories, we preserved the valuable work product while maintaining main's evolution.
+
+**Historical Reference:**
+If you need to review the full development history of the consolidation work, the branch `claude/consolidate-n8n-workflows-01YUderKwjuaqoTX5ZHqU4n2` can be referenced (if still available in the repository) or restored from git history.
+
+**Related Branches:**
+- `antigravity` - Earlier experimental work, valuable parts extracted to main via PR #20
+- `claude/n8n-residency-scheduler-018rSGjXdqQ14ShLY3pMGZzS` - Phase 4-9 compatibility notes (merged)
 
 Created: December 2025
