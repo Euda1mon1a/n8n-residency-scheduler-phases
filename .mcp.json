@@ -1,11 +1,15 @@
 {
   "mcpServers": {
     "n8n": {
-      "type": "http",
-      "url": "${N8N_MCP_URL}",
-      "headers": {
-        "Authorization": "Bearer ${N8N_MCP_TOKEN}"
-      }
+      "command": "npx",
+      "args": [
+        "-y",
+        "supergateway",
+        "--streamableHttp",
+        "${N8N_MCP_URL}",
+        "--header",
+        "authorization:Bearer ${N8N_MCP_TOKEN}"
+      ]
     }
   }
 }
